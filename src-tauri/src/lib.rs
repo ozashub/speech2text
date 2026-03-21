@@ -267,6 +267,11 @@ fn paste_text(text: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn exit_app(app: tauri::AppHandle) {
+    app.exit(0);
+}
+
+#[tauri::command]
 fn show_overlay(app: tauri::AppHandle, state: String) -> Result<(), String> {
     if let Some(w) = app.get_webview_window("overlay") {
         let _ = w.show();
@@ -439,6 +444,7 @@ pub fn run() {
             .inner_size(220.0, 48.0)
             .decorations(false)
             .transparent(true)
+            .shadow(false)
             .always_on_top(true)
             .skip_taskbar(true)
             .visible(false)
@@ -474,6 +480,7 @@ pub fn run() {
             set_hook_enabled,
             transcribe,
             paste_text,
+            exit_app,
             show_overlay,
             hide_overlay,
         ])

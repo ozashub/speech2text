@@ -17,6 +17,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [hasKey, setHasKey] = useState(false);
   const [keybindLabel, setKeybindLabel] = useState("Ctrl+Shift");
+  const [micReady, setMicReady] = useState(false);
 
   const recRef = useRef(false);
   const procRef = useRef(false);
@@ -36,32 +37,31 @@ export default function App() {
     setStatusType(type);
   };
 
-  const start = useCallback(async () => {
-    if (recRef.current || procRef.current) return;
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, sampleRate: 16000, channelCount: 1 },
+    }).then((stream) => {
+      streamRef.current = stream;
+      const ctx = new AudioContext({ sampleRate: 16000 });
+      ctxRef.current = ctx;
+      const source = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+      setMicReady(true);
+    }).catch(() => {
+      stat("mic denied", "err");
+    });
+  }, []);
+
+  const start = useCallback(() => {
+    if (recRef.current || procRef.current || !streamRef.current) return;
     if (!keyRef.current) { setShowSettings(true); return; }
 
-    let stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, sampleRate: 16000, channelCount: 1 },
-      });
-    } catch {
-      stat("mic denied", "err");
-      return;
-    }
-
-    streamRef.current = stream;
-    const ctx = new AudioContext({ sampleRate: 16000 });
-    ctxRef.current = ctx;
-    const source = ctx.createMediaStreamSource(stream);
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 256;
-    analyser.smoothingTimeConstant = 0.8;
-    source.connect(analyser);
-    analyserRef.current = analyser;
-
     chunksRef.current = [];
-    const rec = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
+    const rec = new MediaRecorder(streamRef.current, { mimeType: "audio/webm;codecs=opus" });
     rec.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
     rec.onstop = done;
     rec.start(100);
@@ -74,7 +74,6 @@ export default function App() {
   const stop = useCallback(() => {
     if (!recRef.current || !mediaRef.current) return;
     mediaRef.current.stop();
-    streamRef.current?.getTracks().forEach((t) => t.stop());
     setRecording(false);
   }, []);
 
@@ -103,7 +102,6 @@ export default function App() {
     }
 
     setProcessing(false);
-    if (ctxRef.current) { ctxRef.current.close(); ctxRef.current = null; analyserRef.current = null; }
   };
 
   useEffect(() => {
@@ -129,7 +127,7 @@ export default function App() {
           <button className="win-btn" onClick={() => appWindow.hide()}>
             <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
           </button>
-          <button className="win-btn win-close" onClick={() => appWindow.close()}>
+          <button className="win-btn win-close" onClick={() => invoke("exit_app")}>
             <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" strokeWidth="1.2"/></svg>
           </button>
         </div>
