@@ -27,6 +27,23 @@ mod win {
     pub const WM_KEYUP: u32 = 0x0101;
     pub const WM_SYSKEYDOWN: u32 = 0x0104;
     pub const WM_SYSKEYUP: u32 = 0x0105;
+    pub const MONITOR_DEFAULTTONEAREST: u32 = 2;
+
+    #[repr(C)]
+    pub struct RECT {
+        pub left: i32,
+        pub top: i32,
+        pub right: i32,
+        pub bottom: i32,
+    }
+
+    #[repr(C)]
+    pub struct MONITORINFO {
+        pub cbSize: u32,
+        pub rcMonitor: RECT,
+        pub rcWork: RECT,
+        pub dwFlags: u32,
+    }
 
     #[repr(C)]
     pub struct KBDLLHOOKSTRUCT {
@@ -58,6 +75,9 @@ mod win {
         pub fn CallNextHookEx(hhk: HHOOK, code: i32, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
         pub fn UnhookWindowsHookEx(hhk: HHOOK) -> i32;
         pub fn GetMessageW(msg: *mut MSG, hwnd: HWND, min: u32, max: u32) -> i32;
+        pub fn GetForegroundWindow() -> HWND;
+        pub fn MonitorFromWindow(hwnd: HWND, dwFlags: u32) -> isize;
+        pub fn GetMonitorInfoW(hMonitor: isize, lpmi: *mut MONITORINFO) -> i32;
     }
 }
 
@@ -226,6 +246,7 @@ fn exit_app(app: tauri::AppHandle) {
 
 #[tauri::command]
 fn show_overlay(app: tauri::AppHandle, state: String) -> Result<(), String> {
+    position_overlay_on_active_monitor(&app);
     if let Some(w) = app.get_webview_window("overlay") {
         let _ = w.show();
         let _ = app.emit("overlay-state", state);
@@ -306,6 +327,7 @@ unsafe extern "system" fn kb_proc(
                         s.pressed.insert(vk);
                         if !s.active && s.keys.iter().all(|k| s.pressed.contains(k)) {
                             s.active = true;
+                            position_overlay_on_active_monitor(&s.app);
                             let _ = s.app.emit("start-recording", ());
                             if let Some(w) = s.app.get_webview_window("overlay") {
                                 let _ = w.show();
@@ -324,6 +346,27 @@ unsafe extern "system" fn kb_proc(
         }
     }
     win::CallNextHookEx(0, code, wparam, lparam)
+}
+
+fn position_overlay_on_active_monitor(app: &tauri::AppHandle) {
+    if let Some(w) = app.get_webview_window("overlay") {
+        unsafe {
+            let fg = win::GetForegroundWindow();
+            let monitor = win::MonitorFromWindow(fg, win::MONITOR_DEFAULTTONEAREST);
+            if monitor != 0 {
+                let mut info: win::MONITORINFO = std::mem::zeroed();
+                info.cbSize = std::mem::size_of::<win::MONITORINFO>() as u32;
+                if win::GetMonitorInfoW(monitor, &mut info) != 0 {
+                    let work = &info.rcWork;
+                    let mon_w = (work.right - work.left) as f64;
+                    let x = work.left as f64 + (mon_w - 320.0) / 2.0;
+                    let _ = w.set_position(tauri::Position::Physical(
+                        tauri::PhysicalPosition::new(x as i32, work.top),
+                    ));
+                }
+            }
+        }
+    }
 }
 
 fn spawn_hook(app: tauri::AppHandle, keys: Vec<String>) {
@@ -407,14 +450,6 @@ pub fn run() {
             .focused(false)
             .build()?;
 
-            if let Ok(Some(monitor)) = overlay.current_monitor() {
-                let size = monitor.size();
-                let scale = monitor.scale_factor();
-                let x = (size.width as f64 / scale - 320.0) / 2.0;
-                let _ = overlay.set_position(tauri::Position::Logical(
-                    tauri::LogicalPosition::new(x, 0.0),
-                ));
-            }
             let _ = overlay.set_ignore_cursor_events(true);
 
             let keys = read_config(&app.handle())
