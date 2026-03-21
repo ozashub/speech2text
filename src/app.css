@@ -427,3 +427,32 @@ kbd {
   background: #222;
   color: var(--text);
 }
+
+.keybind-btn {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--bg);
+  border: none;
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.2s;
+}
+
+.keybind-btn:hover {
+  box-shadow: 0 0 0 2px rgba(124, 92, 252, 0.3);
+}
+
+.keybind-btn.active {
+  box-shadow: 0 0 0 2px var(--accent);
+  color: var(--accent);
+  animation: keybind-pulse 1s ease-in-out infinite;
+}
+
+@keyframes keybind-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--accent); }
+  50% { box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(124, 92, 252, 0.2); }
+}

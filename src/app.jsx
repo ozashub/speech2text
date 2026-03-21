@@ -16,6 +16,7 @@ export default function App() {
   const [history, setHistory] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
   const [hasKey, setHasKey] = useState(false);
+  const [keybindLabel, setKeybindLabel] = useState("Ctrl+Shift");
 
   const recRef = useRef(false);
   const procRef = useRef(false);
@@ -68,6 +69,7 @@ export default function App() {
 
     setRecording(true);
     stat("recording", "rec");
+    invoke("show_overlay", { state: "recording" }).catch(() => {});
   }, []);
 
   const stop = useCallback(() => {
@@ -80,6 +82,7 @@ export default function App() {
   const done = async () => {
     setProcessing(true);
     stat("transcribing...", "");
+    invoke("show_overlay", { state: "transcribing" }).catch(() => {});
 
     const blob = new Blob(chunksRef.current, { type: "audio/webm" });
     const buf = await blob.arrayBuffer();
@@ -93,8 +96,7 @@ export default function App() {
       setHistory((h) => [{ text, time: new Date() }, ...h].slice(0, 20));
       stat("pasting...", "done");
       await invoke("paste_text", { text });
-      const preview = text.length > 60 ? text.slice(0, 60) + "..." : text;
-      invoke("notify", { body: preview }).catch(() => {});
+      invoke("show_overlay", { state: "done" }).catch(() => {});
       stat("done", "done");
       setTimeout(() => { if (!recRef.current && !procRef.current) stat("ready", ""); }, 2000);
     } catch (e) {
@@ -110,6 +112,9 @@ export default function App() {
       const exists = !!k;
       setHasKey(exists);
       if (!exists) setShowSettings(true);
+    }).catch(() => {});
+    invoke("load_keybind").then((k) => {
+      if (k?.length) setKeybindLabel(k.join("+"));
     }).catch(() => {});
 
     const u1 = listen("start-recording", () => start());
@@ -166,7 +171,7 @@ export default function App() {
       </main>
 
       <footer>
-        <kbd>hold Ctrl+Shift+Space</kbd>
+        <kbd>hold {keybindLabel}</kbd>
         <button className="gear-btn" onClick={() => setShowSettings(true)}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
@@ -177,7 +182,12 @@ export default function App() {
       {showSettings && (
         <Settings
           onClose={() => setShowSettings(false)}
-          onSaved={() => { setHasKey(true); setShowSettings(false); stat("ready", ""); }}
+          onSaved={() => {
+            setHasKey(true);
+            setShowSettings(false);
+            stat("ready", "");
+            invoke("load_keybind").then((k) => { if (k?.length) setKeybindLabel(k.join("+")); }).catch(() => {});
+          }}
         />
       )}
     </>

@@ -1,17 +1,10 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the main window",
-  "windows": ["main"],
+  "description": "Capabilities",
+  "windows": ["main", "overlay"],
   "permissions": [
     "core:default",
-    "opener:default",
-    "global-shortcut:allow-register",
-    "global-shortcut:allow-unregister",
-    "global-shortcut:default",
-    "notification:default",
-    "notification:allow-notify",
-    "notification:allow-is-permission-granted",
-    "notification:allow-request-permission"
+    "opener:default"
   ]
 }
