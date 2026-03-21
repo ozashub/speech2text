@@ -294,7 +294,7 @@ unsafe extern "system" fn kb_proc(
                         }
                     } else if msg == win::WM_KEYUP || msg == win::WM_SYSKEYUP {
                         s.pressed.remove(&vk);
-                        if s.active {
+                        if s.active && !s.keys.iter().any(|k| s.pressed.contains(k)) {
                             s.active = false;
                             let _ = s.app.emit("stop-recording", ());
                         }
