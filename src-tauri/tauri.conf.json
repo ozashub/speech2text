@@ -1,18 +1,19 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "whisper",
+  "productName": "speech2text",
   "version": "0.1.0",
   "identifier": "com.ozas.speech2text",
   "build": {
-    "frontendDist": "../src"
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
   },
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "whisper",
+        "title": "speech2text",
         "width": 420,
-        "height": 560,
+        "height": 580,
         "resizable": false,
         "decorations": false,
         "transparent": false,
