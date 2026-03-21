@@ -5,6 +5,7 @@ dist-ssr
 
 # Rust
 src-tauri/target
+src-tauri/gen
 
 # Logs
 *.log
@@ -20,4 +21,3 @@ npm-debug.log*
 *.sln
 *.sw?
 .DS_Store
-CLAUDE.md
