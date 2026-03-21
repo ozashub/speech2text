@@ -28,6 +28,12 @@
   "bundle": {
     "active": true,
     "targets": ["nsis"],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "headerImage": null
+      }
+    },
     "createUpdaterArtifacts": true,
     "icon": [
       "icons/icon.png",
