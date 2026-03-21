@@ -15,7 +15,6 @@ use tauri::{Emitter, Manager};
 
 #[allow(non_snake_case)]
 mod win {
-    use std::ffi::c_void;
     pub type WPARAM = usize;
     pub type LPARAM = isize;
     pub type LRESULT = isize;
@@ -120,7 +119,7 @@ fn save_keybind(app: tauri::AppHandle, keys: Vec<String>) -> Result<(), String> 
     let mut c = read_config(&app);
     c.keybind = Some(keys.clone());
     write_config(&app, &c)?;
-    update_hook_keys(keys);
+    set_hook_keys(keys);
     Ok(())
 }
 
@@ -143,14 +142,14 @@ fn set_hook_enabled(enabled: bool) -> Result<(), String> {
 
 #[tauri::command]
 async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<String, String> {
-    let config = read_config(&app);
-    let api_key = config.api_key.ok_or("No API key configured")?;
+    let cfg = read_config(&app);
+    let api_key = cfg.api_key.ok_or("No API key configured")?;
 
-    let audio_data = base64::engine::general_purpose::STANDARD
+    let raw = base64::engine::general_purpose::STANDARD
         .decode(&audio_base64)
         .map_err(|e| e.to_string())?;
 
-    let part = multipart::Part::bytes(audio_data)
+    let part = multipart::Part::bytes(raw)
         .file_name("audio.webm")
         .mime_str("audio/webm")
         .map_err(|e| e.to_string())?;
@@ -159,7 +158,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         .text("model", "whisper-large-v3")
         .part("file", part);
 
-    if let Some(ref lang) = config.language {
+    if let Some(ref lang) = cfg.language {
         if !lang.is_empty() {
             form = form.text("language", lang.clone());
         }
@@ -193,10 +192,10 @@ fn paste_text(text: String) -> Result<(), String> {
     let mut cb = Clipboard::new().map_err(|e| e.to_string())?;
     cb.set_text(&text).map_err(|e| e.to_string())?;
     thread::sleep(Duration::from_millis(80));
-    let mut e = Enigo::new(&Settings::default()).map_err(|e| e.to_string())?;
-    e.key(Key::Control, Direction::Press).map_err(|e| e.to_string())?;
-    e.key(Key::Unicode('v'), Direction::Click).map_err(|e| e.to_string())?;
-    e.key(Key::Control, Direction::Release).map_err(|e| e.to_string())?;
+    let mut kbd = Enigo::new(&Settings::default()).map_err(|e| e.to_string())?;
+    kbd.key(Key::Control, Direction::Press).map_err(|e| e.to_string())?;
+    kbd.key(Key::Unicode('v'), Direction::Click).map_err(|e| e.to_string())?;
+    kbd.key(Key::Control, Direction::Release).map_err(|e| e.to_string())?;
     Ok(())
 }
 
@@ -250,7 +249,7 @@ fn key_to_vk(name: &str) -> u32 {
     }
 }
 
-fn normalize_vk(vk: u32) -> u32 {
+fn norm_vk(vk: u32) -> u32 {
     match vk {
         0xA0 | 0xA1 => 0x10,
         0xA2 | 0xA3 => 0x11,
@@ -260,7 +259,7 @@ fn normalize_vk(vk: u32) -> u32 {
     }
 }
 
-fn update_hook_keys(names: Vec<String>) {
+fn set_hook_keys(names: Vec<String>) {
     if let Ok(mut g) = HOOK.lock() {
         if let Some(ref mut s) = *g {
             s.keys = names.iter().map(|n| key_to_vk(n)).collect();
@@ -277,7 +276,7 @@ unsafe extern "system" fn kb_proc(
 ) -> win::LRESULT {
     if code >= 0 {
         let kb = &*(lparam as *const win::KBDLLHOOKSTRUCT);
-        let vk = normalize_vk(kb.vkCode);
+        let vk = norm_vk(kb.vkCode);
 
         if let Ok(mut g) = HOOK.try_lock() {
             if let Some(ref mut s) = *g {
@@ -307,7 +306,7 @@ unsafe extern "system" fn kb_proc(
     win::CallNextHookEx(0, code, wparam, lparam)
 }
 
-fn start_hook(app: tauri::AppHandle, keys: Vec<String>) {
+fn spawn_hook(app: tauri::AppHandle, keys: Vec<String>) {
     let vks: Vec<u32> = keys.iter().map(|k| key_to_vk(k)).collect();
     *HOOK.lock().unwrap() = Some(HookState {
         keys: vks,
@@ -397,11 +396,10 @@ pub fn run() {
             }
             let _ = overlay.set_ignore_cursor_events(true);
 
-            let config = read_config(&app.handle());
-            let keybind = config
+            let keys = read_config(&app.handle())
                 .keybind
                 .unwrap_or_else(|| vec!["Control".into(), "Shift".into()]);
-            start_hook(app.handle().clone(), keybind);
+            spawn_hook(app.handle().clone(), keys);
 
             Ok(())
         })
