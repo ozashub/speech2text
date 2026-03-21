@@ -27,6 +27,7 @@ export default function App() {
   const analyserRef = useRef(null);
   const ctxRef = useRef(null);
   const chunksRef = useRef([]);
+  const sessionRef = useRef(0);
 
   useEffect(() => { recRef.current = recording; }, [recording]);
   useEffect(() => { procRef.current = processing; }, [processing]);
@@ -61,6 +62,7 @@ export default function App() {
     if (!keyRef.current) { setShowSettings(true); return; }
 
     chunksRef.current = [];
+    sessionRef.current++;
     const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
     const rec = new MediaRecorder(streamRef.current, { mimeType: mime });
     rec.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
@@ -80,6 +82,7 @@ export default function App() {
   }, []);
 
   const done = async () => {
+    const sid = sessionRef.current;
     setProcessing(true);
     stat("transcribing...", "");
     invoke("show_overlay", { state: "transcribing" }).catch(() => {});
@@ -91,17 +94,20 @@ export default function App() {
 
     try {
       const text = await invoke("transcribe", { audioBase64: btoa(bin) });
+      if (sid !== sessionRef.current) return;
       setTranscript(text);
       setHistory((h) => [{ text, time: new Date() }, ...h].slice(0, 20));
       stat("pasting...", "done");
       await invoke("paste_text", { text });
+      if (sid !== sessionRef.current) return;
       invoke("show_overlay", { state: "done" }).catch(() => {});
       stat("done", "done");
-      setTimeout(() => { if (!recRef.current && !procRef.current) stat("ready", ""); }, 2000);
+      setTimeout(() => { if (sid === sessionRef.current && !recRef.current) stat("ready", ""); }, 2000);
     } catch (e) {
+      if (sid !== sessionRef.current) return;
       stat(String(e), "err");
       invoke("hide_overlay").catch(() => {});
-      setTimeout(() => { if (!recRef.current && !procRef.current) stat("ready", ""); }, 5000);
+      setTimeout(() => { if (sid === sessionRef.current && !recRef.current) stat("ready", ""); }, 5000);
     }
 
     setProcessing(false);
