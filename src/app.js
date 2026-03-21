@@ -9,8 +9,8 @@ let audioStream = null;
 let analyser = null;
 let audioCtx = null;
 let chunks = [];
-let animFrame = null;
 let hasKey = false;
+let smoothed = new Float32Array(64);
 
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
@@ -22,6 +22,9 @@ const output = document.getElementById("output");
 const outputText = document.getElementById("output-text");
 const settingsPanel = document.getElementById("settings-panel");
 const apiKeyInput = document.getElementById("api-key-input");
+const languageSelect = document.getElementById("language-select");
+const eyeOpen = document.getElementById("eye-open");
+const eyeClosed = document.getElementById("eye-closed");
 
 function setStatus(text, cls) {
   statusEl.textContent = text;
@@ -52,11 +55,15 @@ function drawBars() {
   }
 
   for (let i = 0; i < barCount; i++) {
-    let val = 0;
+    let target = 0;
     if (dataArray) {
       const idx = Math.floor((i * dataArray.length) / barCount);
-      val = dataArray[idx] / 255;
+      target = dataArray[idx] / 255;
     }
+
+    smoothed[i] += (target - smoothed[i]) * 0.12;
+    if (smoothed[i] < 0.005) smoothed[i] = 0;
+    const val = smoothed[i];
 
     const barH = Math.max(2, val * (h - 8));
     const x = gap + i * (barW + gap);
@@ -81,7 +88,7 @@ function drawBars() {
     ctx.fill();
   }
 
-  animFrame = requestAnimationFrame(drawBars);
+  requestAnimationFrame(drawBars);
 }
 
 async function startRecording() {
@@ -101,7 +108,7 @@ async function startRecording() {
         channelCount: 1,
       },
     });
-  } catch (e) {
+  } catch (_) {
     setStatus("mic access denied", "err");
     return;
   }
@@ -161,6 +168,10 @@ async function handleRecordingDone() {
     setStatus("pasting...", "done");
 
     await invoke("paste_text", { text });
+
+    const preview = text.length > 60 ? text.slice(0, 60) + "..." : text;
+    invoke("notify", { body: preview }).catch(() => {});
+
     setStatus("done", "done");
     setTimeout(() => {
       if (!recording && !processing) setStatus("ready", "");
@@ -188,18 +199,29 @@ function hideSettings() {
   settingsPanel.classList.add("hidden");
 }
 
-async function saveKey() {
+async function saveSettings() {
   const key = apiKeyInput.value.trim();
-  if (!key) return;
+  if (!key && !hasKey) return;
+
   try {
-    await invoke("save_api_key", { key });
-    hasKey = true;
-    apiKeyInput.value = "";
+    if (key) {
+      await invoke("save_api_key", { key });
+      hasKey = true;
+      apiKeyInput.value = "";
+    }
+    await invoke("save_language", { language: languageSelect.value });
     hideSettings();
     setStatus("ready", "");
   } catch (e) {
-    setStatus("failed to save key", "err");
+    setStatus("failed to save", "err");
   }
+}
+
+function toggleKeyVisibility() {
+  const showing = apiKeyInput.type === "text";
+  apiKeyInput.type = showing ? "password" : "text";
+  eyeOpen.classList.toggle("hidden", !showing);
+  eyeClosed.classList.toggle("hidden", showing);
 }
 
 async function init() {
@@ -208,7 +230,7 @@ async function init() {
 
   const appWindow = getCurrentWindow();
   document.getElementById("btn-minimize").addEventListener("click", () => appWindow.minimize());
-  document.getElementById("btn-close").addEventListener("click", () => appWindow.close());
+  document.getElementById("btn-close").addEventListener("click", () => appWindow.hide());
 
   let mouseDown = false;
   recordBtn.addEventListener("mousedown", () => {
@@ -227,10 +249,11 @@ async function init() {
   document.getElementById("btn-settings").addEventListener("click", showSettings);
   document.getElementById("settings-overlay").addEventListener("click", hideSettings);
   document.getElementById("btn-cancel-settings").addEventListener("click", hideSettings);
-  document.getElementById("btn-save-key").addEventListener("click", saveKey);
+  document.getElementById("btn-save-key").addEventListener("click", saveSettings);
+  document.getElementById("btn-toggle-key").addEventListener("click", toggleKeyVisibility);
 
   apiKeyInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") saveKey();
+    if (e.key === "Enter") saveSettings();
     if (e.key === "Escape") hideSettings();
   });
 
@@ -241,9 +264,12 @@ async function init() {
     hasKey = false;
   }
 
-  if (!hasKey) {
-    showSettings();
-  }
+  try {
+    const lang = await invoke("load_language");
+    if (lang) languageSelect.value = lang;
+  } catch (_) {}
+
+  if (!hasKey) showSettings();
 
   await listen("start-recording", () => startRecording());
   await listen("stop-recording", () => stopRecording());
