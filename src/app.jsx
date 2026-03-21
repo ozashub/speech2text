@@ -69,6 +69,7 @@ export default function App() {
 
     setRecording(true);
     stat("recording", "rec");
+    invoke("show_overlay", { state: "recording" }).catch(() => {});
   }, []);
 
   const stop = useCallback(() => {
@@ -139,9 +140,7 @@ export default function App() {
         <section className="record-section">
           <button
             className={`rec-btn${recording ? " on" : ""}${processing ? " busy" : ""}`}
-            onMouseDown={start}
-            onMouseUp={stop}
-            onMouseLeave={() => { if (recRef.current) stop(); }}
+            onClick={() => { if (recording) stop(); else start(); }}
           >
             {recording ? (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>

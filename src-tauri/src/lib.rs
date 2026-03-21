@@ -441,7 +441,7 @@ pub fn run() {
                 tauri::WebviewUrl::App("overlay.html".into()),
             )
             .title("")
-            .inner_size(220.0, 48.0)
+            .inner_size(320.0, 80.0)
             .decorations(false)
             .transparent(true)
             .shadow(false)
@@ -455,9 +455,9 @@ pub fn run() {
             if let Ok(Some(monitor)) = overlay.current_monitor() {
                 let size = monitor.size();
                 let scale = monitor.scale_factor();
-                let x = (size.width as f64 / scale - 220.0) / 2.0;
+                let x = (size.width as f64 / scale - 320.0) / 2.0;
                 let _ = overlay.set_position(tauri::Position::Logical(
-                    tauri::LogicalPosition::new(x, 8.0),
+                    tauri::LogicalPosition::new(x, 0.0),
                 ));
             }
             let _ = overlay.set_ignore_cursor_events(true);
