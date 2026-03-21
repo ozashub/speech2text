@@ -6,7 +6,6 @@ use enigo::{Direction, Enigo, Key, Keyboard, Settings};
 use reqwest::multipart;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
-use std::ffi::c_void;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -23,14 +22,12 @@ mod win {
     pub type HHOOK = isize;
     pub type HINSTANCE = isize;
     pub type HWND = isize;
-    pub type HANDLE = *mut c_void;
 
     pub const WH_KEYBOARD_LL: i32 = 13;
     pub const WM_KEYDOWN: u32 = 0x0100;
     pub const WM_KEYUP: u32 = 0x0101;
     pub const WM_SYSKEYDOWN: u32 = 0x0104;
     pub const WM_SYSKEYUP: u32 = 0x0105;
-    pub const TOKEN_QUERY: u32 = 0x0008;
 
     #[repr(C)]
     pub struct KBDLLHOOKSTRUCT {
@@ -52,11 +49,6 @@ mod win {
         pub pt_y: i32,
     }
 
-    #[repr(C)]
-    pub struct TOKEN_ELEVATION {
-        pub TokenIsElevated: u32,
-    }
-
     extern "system" {
         pub fn SetWindowsHookExW(
             idHook: i32,
@@ -67,64 +59,6 @@ mod win {
         pub fn CallNextHookEx(hhk: HHOOK, code: i32, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
         pub fn UnhookWindowsHookEx(hhk: HHOOK) -> i32;
         pub fn GetMessageW(msg: *mut MSG, hwnd: HWND, min: u32, max: u32) -> i32;
-        pub fn OpenProcessToken(proc_: HANDLE, access: u32, token: *mut HANDLE) -> i32;
-        pub fn GetCurrentProcess() -> HANDLE;
-        pub fn GetTokenInformation(
-            token: HANDLE,
-            class: u32,
-            info: *mut c_void,
-            len: u32,
-            ret_len: *mut u32,
-        ) -> i32;
-        pub fn CloseHandle(h: HANDLE) -> i32;
-        pub fn ShellExecuteW(
-            hwnd: HWND,
-            op: *const u16,
-            file: *const u16,
-            params: *const u16,
-            dir: *const u16,
-            show: i32,
-        ) -> HINSTANCE;
-    }
-}
-
-fn wide(s: &str) -> Vec<u16> {
-    s.encode_utf16().chain(std::iter::once(0)).collect()
-}
-
-pub fn is_elevated() -> bool {
-    unsafe {
-        let mut token: win::HANDLE = std::ptr::null_mut();
-        if win::OpenProcessToken(win::GetCurrentProcess(), win::TOKEN_QUERY, &mut token) == 0 {
-            return false;
-        }
-        let mut elev = win::TOKEN_ELEVATION { TokenIsElevated: 0 };
-        let mut sz = 0u32;
-        let ok = win::GetTokenInformation(
-            token,
-            20, // TokenElevation
-            &mut elev as *mut _ as *mut c_void,
-            std::mem::size_of::<win::TOKEN_ELEVATION>() as u32,
-            &mut sz,
-        );
-        win::CloseHandle(token);
-        ok != 0 && elev.TokenIsElevated != 0
-    }
-}
-
-pub fn elevate_self() {
-    let exe = std::env::current_exe().unwrap();
-    let exe_w = wide(&exe.to_string_lossy());
-    let runas = wide("runas");
-    unsafe {
-        win::ShellExecuteW(
-            0,
-            runas.as_ptr(),
-            exe_w.as_ptr(),
-            std::ptr::null(),
-            std::ptr::null(),
-            1,
-        );
     }
 }
 

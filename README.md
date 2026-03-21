@@ -53,4 +53,4 @@ Sign up at [console.groq.com](https://console.groq.com), create an API key, and 
 
 ## License
 
-MIT
+AGPL-3.0 — see [LICENSE](LICENSE)
