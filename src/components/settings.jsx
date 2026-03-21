@@ -72,6 +72,9 @@ export default function Settings({ onClose, onSaved }) {
   const [visible, setVisible] = useState(false);
   const [autostart, setAutostart] = useState(false);
   const [version, setVersion] = useState("");
+  const [updateStatus, setUpdateStatus] = useState("");
+  const [updateProgress, setUpdateProgress] = useState(-1);
+  const updateRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -81,6 +84,40 @@ export default function Settings({ onClose, onSaved }) {
     getVersion().then(setVersion).catch(() => {});
     setTimeout(() => inputRef.current?.focus(), 50);
   }, []);
+
+  const checkUpdate = async () => {
+    setUpdateStatus("checking");
+    try {
+      const { check } = await import("@tauri-apps/plugin-updater");
+      const update = await check();
+      if (!update) { setUpdateStatus("uptodate"); return; }
+      updateRef.current = update;
+      setUpdateStatus("available");
+    } catch {
+      setUpdateStatus("error");
+    }
+  };
+
+  const installUpdate = async () => {
+    if (!updateRef.current) return;
+    setUpdateStatus("downloading");
+    setUpdateProgress(0);
+    try {
+      let total = 0;
+      let received = 0;
+      await updateRef.current.downloadAndInstall((e) => {
+        if (e.event === "Started" && e.data.contentLength) total = e.data.contentLength;
+        if (e.event === "Progress") {
+          received += e.data.chunkLength;
+          if (total > 0) setUpdateProgress((received / total) * 100);
+        }
+        if (e.event === "Finished") setUpdateStatus("installing");
+      });
+      await invoke("exit_app");
+    } catch {
+      setUpdateStatus("error");
+    }
+  };
 
   const save = async () => {
     try {
@@ -154,7 +191,25 @@ export default function Settings({ onClose, onSaved }) {
           <button className="btn-cancel" onClick={onClose}>cancel</button>
         </div>
 
-        {version && <span className="version-label">v{version}</span>}
+        <div className="update-section">
+          {version && <span className="version-label">v{version}</span>}
+          {updateStatus === "" && (
+            <button className="update-btn" type="button" onClick={checkUpdate}>check for updates</button>
+          )}
+          {updateStatus === "checking" && <span className="update-status">checking...</span>}
+          {updateStatus === "available" && (
+            <button className="update-btn accent" type="button" onClick={installUpdate}>update available — install now</button>
+          )}
+          {updateStatus === "downloading" && (
+            <div className="update-progress">
+              <div className="update-bar"><div className="update-fill" style={{ width: `${Math.max(0, updateProgress)}%` }} /></div>
+              <span className="update-status">{updateProgress >= 0 ? `${Math.round(updateProgress)}%` : "downloading..."}</span>
+            </div>
+          )}
+          {updateStatus === "installing" && <span className="update-status">installing...</span>}
+          {updateStatus === "uptodate" && <span className="update-status">you're on the latest version</span>}
+          {updateStatus === "error" && <span className="update-status err">update failed</span>}
+        </div>
       </div>
     </div>
   );

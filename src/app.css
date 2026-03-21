@@ -523,9 +523,71 @@ kbd {
   background: white;
 }
 
+.update-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
 .version-label {
   font-size: 11px;
   color: var(--text-3);
-  text-align: center;
-  display: block;
+}
+
+.update-btn {
+  font-size: 11px;
+  color: var(--text-2);
+  background: var(--bg);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.update-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.update-btn.accent {
+  background: var(--accent);
+  color: white;
+}
+
+.update-btn.accent:hover {
+  background: var(--accent-hover);
+}
+
+.update-status {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.update-status.err {
+  color: var(--danger);
+}
+
+.update-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.update-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.update-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.15s;
 }
