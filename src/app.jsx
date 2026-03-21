@@ -84,8 +84,7 @@ export default function App() {
     invoke("show_overlay", { state: "transcribing" }).catch(() => {});
 
     const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-    const buf = await blob.arrayBuffer();
-    const bytes = new Uint8Array(buf);
+    const bytes = new Uint8Array(await blob.arrayBuffer());
     let bin = "";
     for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
 
@@ -107,9 +106,8 @@ export default function App() {
 
   useEffect(() => {
     invoke("load_api_key").then((k) => {
-      const exists = !!k;
-      setHasKey(exists);
-      if (!exists) setShowSettings(true);
+      setHasKey(!!k);
+      if (!k) setShowSettings(true);
     }).catch(() => {});
     invoke("load_keybind").then((k) => {
       if (k?.length) setKeybindLabel(k.join("+"));
@@ -117,11 +115,8 @@ export default function App() {
 
     import("@tauri-apps/plugin-updater").then(({ check }) => {
       check().then((update) => {
-        if (update) {
-          update.downloadAndInstall().then(() => {
-            invoke("exit_app");
-          });
-        }
+        if (!update) return;
+        update.downloadAndInstall().then(() => invoke("exit_app"));
       }).catch(() => {});
     }).catch(() => {});
 

@@ -83,7 +83,7 @@ export default function Settings({ onClose, onSaved }) {
       await invoke("save_language", { language: lang });
       await invoke("save_keybind", { keys: keybind });
       onSaved();
-    } catch { /* */ }
+    } catch {}
   };
 
   return (

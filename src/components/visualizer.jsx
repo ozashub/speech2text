@@ -31,8 +31,7 @@ export default function Visualizer({ analyserRef, recording, processing }) {
 
       let data = null;
       if (analyserRef.current && rec) {
-        const buf = analyserRef.current.frequencyBinCount;
-        data = new Uint8Array(buf);
+        data = new Uint8Array(analyserRef.current.frequencyBinCount);
         analyserRef.current.getByteFrequencyData(data);
       }
 
