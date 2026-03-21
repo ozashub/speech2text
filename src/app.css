@@ -298,6 +298,17 @@ kbd {
   to { opacity: 1; }
 }
 
+.overlay.out {
+  opacity: 0;
+  transition: opacity 0.15s ease-in;
+}
+
+.overlay.out .modal {
+  transform: translateY(8px) scale(0.97);
+  opacity: 0;
+  transition: transform 0.15s ease-in, opacity 0.15s ease-in;
+}
+
 .modal {
   background: var(--surface);
   border-radius: 16px;

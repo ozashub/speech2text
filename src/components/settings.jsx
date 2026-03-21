@@ -74,8 +74,14 @@ export default function Settings({ onClose, onSaved }) {
   const [version, setVersion] = useState("");
   const [updateStatus, setUpdateStatus] = useState("");
   const [updateProgress, setUpdateProgress] = useState(-1);
+  const [closing, setClosing] = useState(false);
   const updateRef = useRef(null);
   const inputRef = useRef(null);
+
+  const animateClose = (cb) => {
+    setClosing(true);
+    setTimeout(cb, 150);
+  };
 
   useEffect(() => {
     invoke("load_language").then((l) => { if (l) setLang(l); }).catch(() => {});
@@ -130,7 +136,7 @@ export default function Settings({ onClose, onSaved }) {
   };
 
   return (
-    <div className="overlay" onClick={onClose}>
+    <div className={`overlay ${closing ? "out" : ""}`} onClick={() => animateClose(onClose)}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>settings</h2>
 
@@ -143,7 +149,7 @@ export default function Settings({ onClose, onSaved }) {
               placeholder="gsk_..."
               value={key}
               onChange={(e) => setKey(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") onClose(); }}
+              onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") animateClose(onClose); }}
               spellCheck={false}
               autoComplete="off"
             />
@@ -189,7 +195,7 @@ export default function Settings({ onClose, onSaved }) {
 
         <div className="modal-actions">
           <button className="btn-save" onClick={save}>save</button>
-          <button className="btn-cancel" onClick={onClose}>cancel</button>
+          <button className="btn-cancel" onClick={() => animateClose(onClose)}>cancel</button>
         </div>
 
         <div className="update-section">

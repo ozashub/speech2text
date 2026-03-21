@@ -58,11 +58,12 @@ export default function App() {
   }, []);
 
   const start = useCallback(() => {
-    if (recRef.current || procRef.current || !streamRef.current) return;
+    if (recRef.current || !streamRef.current) return;
     if (!keyRef.current) { setShowSettings(true); return; }
 
     chunksRef.current = [];
     sessionRef.current++;
+    setProcessing(false);
     const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
     const rec = new MediaRecorder(streamRef.current, { mimeType: mime });
     rec.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
