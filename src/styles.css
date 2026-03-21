@@ -39,8 +39,8 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 0 8px 0 16px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   -webkit-app-region: drag;
 }
 
@@ -109,14 +109,15 @@ html, body {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  border: 2px solid var(--border);
-  background: var(--surface);
+  border: none;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.25s ease;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .record-btn .btn-icon {
@@ -131,22 +132,22 @@ html, body {
 }
 
 .record-btn:hover {
-  border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-dim);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.3), 0 0 20px rgba(139, 92, 246, 0.1);
 }
 
 .record-btn.recording {
-  border-color: var(--red);
   color: var(--red);
   background: var(--red-dim);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4), 0 0 24px rgba(239, 68, 68, 0.15);
   animation: pulse 1.8s ease-in-out infinite;
 }
 
 .record-btn.processing {
-  border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-dim);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.3);
   pointer-events: none;
 }
 
@@ -177,11 +178,12 @@ html, body {
 .output {
   margin-bottom: 16px;
   padding: 12px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
   border-radius: 8px;
   max-height: 100px;
   overflow-y: auto;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .output p {
@@ -209,9 +211,10 @@ html, body {
 
 .hotkey {
   font-size: 11px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.2);
   padding: 4px 8px;
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
   border-radius: 4px;
   font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
 }
@@ -252,82 +255,110 @@ html, body {
 .settings-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
 }
 
 .settings-content {
   position: relative;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 28px;
+  background: #161616;
+  border: none;
+  border-radius: 16px;
+  padding: 32px;
   width: 320px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 24px 48px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(139, 92, 246, 0.04);
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .settings-content h2 {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text);
-  letter-spacing: 0.3px;
+  letter-spacing: -0.2px;
 }
 
 .settings-content label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: -12px;
 }
 
 .settings-content input {
   width: 100%;
-  padding: 10px 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
   color: var(--text);
   font-size: 13px;
   font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .settings-content input:focus {
-  border-color: var(--accent);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
 .settings-content input::placeholder {
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.15);
 }
 
 .settings-actions {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  margin-top: 4px;
 }
 
 .btn-primary {
-  padding: 8px 20px;
+  padding: 9px 22px;
   background: var(--accent);
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   color: white;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
 .btn-primary:hover {
-  opacity: 0.85;
+  background: #7c4deb;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-ghost {
-  padding: 8px 16px;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 9px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: none;
+  border-radius: 8px;
   color: var(--muted);
   font-size: 13px;
   cursor: pointer;
@@ -335,6 +366,6 @@ html, body {
 }
 
 .btn-ghost:hover {
-  background: var(--surface-hover);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text);
 }

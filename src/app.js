@@ -17,15 +17,15 @@ const ctx = canvas.getContext("2d");
 const recordBtn = document.getElementById("record-btn");
 const micIcon = document.getElementById("mic-icon");
 const stopIcon = document.getElementById("stop-icon");
-const status = document.getElementById("status");
+const statusEl = document.getElementById("status");
 const output = document.getElementById("output");
 const outputText = document.getElementById("output-text");
 const settingsPanel = document.getElementById("settings-panel");
 const apiKeyInput = document.getElementById("api-key-input");
 
 function setStatus(text, cls) {
-  status.textContent = text;
-  status.className = "status" + (cls ? " " + cls : "");
+  statusEl.textContent = text;
+  statusEl.className = "status" + (cls ? " " + cls : "");
 }
 
 function resizeCanvas() {
@@ -85,26 +85,43 @@ function drawBars() {
 }
 
 async function startRecording() {
+  if (recording || processing) return;
+  if (!hasKey) {
+    showSettings();
+    return;
+  }
+
   try {
-    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        sampleRate: 16000,
+        channelCount: 1,
+      },
+    });
   } catch (e) {
     setStatus("mic access denied", "err");
     return;
   }
 
-  audioCtx = new AudioContext();
+  audioCtx = new AudioContext({ sampleRate: 16000 });
   const source = audioCtx.createMediaStreamSource(audioStream);
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = 0.8;
   source.connect(analyser);
 
   chunks = [];
-  mediaRecorder = new MediaRecorder(audioStream, { mimeType: "audio/webm;codecs=opus" });
+  mediaRecorder = new MediaRecorder(audioStream, {
+    mimeType: "audio/webm;codecs=opus",
+  });
   mediaRecorder.ondataavailable = (e) => {
     if (e.data.size > 0) chunks.push(e.data);
   };
   mediaRecorder.onstop = handleRecordingDone;
-  mediaRecorder.start();
+  mediaRecorder.start(100);
 
   recording = true;
   recordBtn.classList.add("recording");
@@ -114,7 +131,7 @@ async function startRecording() {
 }
 
 function stopRecording() {
-  if (!mediaRecorder || mediaRecorder.state === "inactive") return;
+  if (!recording || !mediaRecorder || mediaRecorder.state === "inactive") return;
   mediaRecorder.stop();
   audioStream.getTracks().forEach((t) => t.stop());
   recording = false;
@@ -162,19 +179,6 @@ async function handleRecordingDone() {
   }
 }
 
-function toggleRecording() {
-  if (processing) return;
-  if (!hasKey) {
-    showSettings();
-    return;
-  }
-  if (recording) {
-    stopRecording();
-  } else {
-    startRecording();
-  }
-}
-
 function showSettings() {
   settingsPanel.classList.remove("hidden");
   apiKeyInput.focus();
@@ -206,7 +210,20 @@ async function init() {
   document.getElementById("btn-minimize").addEventListener("click", () => appWindow.minimize());
   document.getElementById("btn-close").addEventListener("click", () => appWindow.close());
 
-  recordBtn.addEventListener("click", toggleRecording);
+  let mouseDown = false;
+  recordBtn.addEventListener("mousedown", () => {
+    mouseDown = true;
+    startRecording();
+  });
+  recordBtn.addEventListener("mouseup", () => {
+    if (mouseDown) stopRecording();
+    mouseDown = false;
+  });
+  recordBtn.addEventListener("mouseleave", () => {
+    if (mouseDown) stopRecording();
+    mouseDown = false;
+  });
+
   document.getElementById("btn-settings").addEventListener("click", showSettings);
   document.getElementById("settings-overlay").addEventListener("click", hideSettings);
   document.getElementById("btn-cancel-settings").addEventListener("click", hideSettings);
@@ -228,7 +245,8 @@ async function init() {
     showSettings();
   }
 
-  await listen("toggle-recording", toggleRecording);
+  await listen("start-recording", () => startRecording());
+  await listen("stop-recording", () => stopRecording());
 
   drawBars();
 }

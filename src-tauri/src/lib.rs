@@ -114,8 +114,14 @@ pub fn run() {
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(move |app, _shortcut, event| {
-                    if event.state == tauri_plugin_global_shortcut::ShortcutState::Pressed {
-                        let _ = app.emit("toggle-recording", ());
+                    use tauri_plugin_global_shortcut::ShortcutState;
+                    match event.state {
+                        ShortcutState::Pressed => {
+                            let _ = app.emit("start-recording", ());
+                        }
+                        ShortcutState::Released => {
+                            let _ = app.emit("stop-recording", ());
+                        }
                     }
                 })
                 .build(),
