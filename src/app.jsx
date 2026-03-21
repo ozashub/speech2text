@@ -115,6 +115,16 @@ export default function App() {
       if (k?.length) setKeybindLabel(k.join("+"));
     }).catch(() => {});
 
+    import("@tauri-apps/plugin-updater").then(({ check }) => {
+      check().then((update) => {
+        if (update) {
+          update.downloadAndInstall().then(() => {
+            invoke("exit_app");
+          });
+        }
+      }).catch(() => {});
+    }).catch(() => {});
+
     const u1 = listen("start-recording", () => start());
     const u2 = listen("stop-recording", () => stop());
     return () => { u1.then((f) => f()); u2.then((f) => f()); };
