@@ -51,6 +51,10 @@ Produces a standalone NSIS installer in `src-tauri/target/release/bundle/nsis/`.
 
 Sign up at [console.groq.com](https://console.groq.com), create an API key, and paste it into the app's settings panel.
 
+## Author
+
+Built by [ozas](https://github.com/ozashub).
+
 ## License
 
 AGPL-3.0 — see [LICENSE](LICENSE)
