@@ -1,38 +1,51 @@
-# whisper
+<p align="center">
+  <img src="logo.svg" width="128" height="128" alt="speech2text">
+</p>
 
-Desktop speech-to-text powered by Groq's Whisper v3 API. Record your voice, get the transcription pasted directly into whatever you're typing.
+<h1 align="center">speech2text</h1>
 
-Built with Tauri (Rust backend, vanilla JS frontend).
+<p align="center">Desktop speech-to-text powered by Groq's Whisper v3 API.<br>Record your voice, get the transcription pasted directly into whatever you're typing.</p>
 
 ## How it works
 
 1. Set your Groq API key in settings
-2. Hit the record button or press `Ctrl + Shift + Space`
+2. Hold your keybind (default `Ctrl+Shift`) or click the mic button
 3. Speak
-4. Press again to stop — your speech gets transcribed and pasted into the active text field
+4. Release the keys (or click again) — transcription gets pasted into the active text field
 
-The audio visualizer at the top responds to your microphone input in real time.
+A Dynamic Island-style overlay appears at the top of your screen showing recording/transcribing/done status.
+
+## Features
+
+- Push-to-talk with configurable keybind (supports any key combo including modifier-only)
+- Real-time audio visualizer
+- Transcript history
+- Language selection (24 languages or auto-detect)
+- System tray with minimize-to-tray
+- Lightweight native app (~5MB)
 
 ## Stack
 
-- **Backend**: Rust via Tauri v2 — handles API calls, clipboard, keystroke simulation
-- **Frontend**: Vanilla JS with Web Audio API for the visualizer
-- **API**: Groq Whisper Large v3 for transcription
+- **Backend**: Rust via Tauri v2 — Groq API, clipboard, raw Win32 keyboard hook, keystroke simulation
+- **Frontend**: React + Vite with Web Audio API visualizer
+- **API**: Groq Whisper Large v3
 
 ## Building
 
-You'll need Rust and Node.js installed. On Windows with the GNU toolchain, make sure MinGW's `dlltool` is on your PATH (e.g. via MSYS2).
+Requires Rust and Node.js.
 
 ```
 npm install
 npm run tauri dev
 ```
 
-To create a release build:
+Release build:
 
 ```
-npm run tauri build
+npx tauri build
 ```
+
+Produces a standalone NSIS installer in `src-tauri/target/release/bundle/nsis/`.
 
 ## Getting a Groq API key
 
