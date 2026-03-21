@@ -164,7 +164,10 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         }
     }
 
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(30))
+        .build()
+        .map_err(|e| e.to_string())?;
     let resp = client
         .post("https://api.groq.com/openai/v1/audio/transcriptions")
         .header("Authorization", format!("Bearer {}", api_key))
@@ -197,6 +200,23 @@ fn paste_text(text: String) -> Result<(), String> {
     kbd.key(Key::Unicode('v'), Direction::Click).map_err(|e| e.to_string())?;
     kbd.key(Key::Control, Direction::Release).map_err(|e| e.to_string())?;
     Ok(())
+}
+
+#[tauri::command]
+fn get_autostart(app: tauri::AppHandle) -> Result<bool, String> {
+    use tauri_plugin_autostart::ManagerExt;
+    app.autolaunch().is_enabled().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn set_autostart(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    use tauri_plugin_autostart::ManagerExt;
+    let mgr = app.autolaunch();
+    if enabled {
+        mgr.enable().map_err(|e| e.to_string())
+    } else {
+        mgr.disable().map_err(|e| e.to_string())
+    }
 }
 
 #[tauri::command]
@@ -332,6 +352,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .setup(|app| {
             use tauri::menu::{MenuBuilder, MenuItem};
             use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
@@ -411,6 +432,8 @@ pub fn run() {
             save_keybind,
             load_keybind,
             set_hook_enabled,
+            get_autostart,
+            set_autostart,
             transcribe,
             paste_text,
             exit_app,

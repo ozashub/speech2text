@@ -61,7 +61,8 @@ export default function App() {
     if (!keyRef.current) { setShowSettings(true); return; }
 
     chunksRef.current = [];
-    const rec = new MediaRecorder(streamRef.current, { mimeType: "audio/webm;codecs=opus" });
+    const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
+    const rec = new MediaRecorder(streamRef.current, { mimeType: mime });
     rec.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
     rec.onstop = done;
     rec.start(100);
@@ -99,6 +100,8 @@ export default function App() {
       setTimeout(() => { if (!recRef.current && !procRef.current) stat("ready", ""); }, 2000);
     } catch (e) {
       stat(String(e), "err");
+      invoke("hide_overlay").catch(() => {});
+      setTimeout(() => { if (!recRef.current && !procRef.current) stat("ready", ""); }, 5000);
     }
 
     setProcessing(false);

@@ -69,11 +69,13 @@ export default function Settings({ onClose, onSaved }) {
   const [lang, setLang] = useState("");
   const [keybind, setKeybind] = useState(["Control", "Shift"]);
   const [visible, setVisible] = useState(false);
+  const [autostart, setAutostart] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
     invoke("load_language").then((l) => { if (l) setLang(l); }).catch(() => {});
     invoke("load_keybind").then((k) => { if (k?.length) setKeybind(k); }).catch(() => {});
+    invoke("get_autostart").then(setAutostart).catch(() => {});
     setTimeout(() => inputRef.current?.focus(), 50);
   }, []);
 
@@ -82,6 +84,7 @@ export default function Settings({ onClose, onSaved }) {
       if (key.trim()) await invoke("save_api_key", { key: key.trim() });
       await invoke("save_language", { language: lang });
       await invoke("save_keybind", { keys: keybind });
+      await invoke("set_autostart", { enabled: autostart });
       onSaved();
     } catch {}
   };
@@ -130,6 +133,17 @@ export default function Settings({ onClose, onSaved }) {
         <div className="field-group">
           <label>push-to-talk keybind</label>
           <KeybindCapture value={keybind} onChange={setKeybind} />
+        </div>
+
+        <div className="field-group toggle-row">
+          <label>launch on startup</label>
+          <button
+            className={`toggle ${autostart ? "on" : ""}`}
+            onClick={() => setAutostart(!autostart)}
+            type="button"
+          >
+            <span className="toggle-knob" />
+          </button>
         </div>
 
         <div className="modal-actions">
