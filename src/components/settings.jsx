@@ -161,6 +161,7 @@ export default function Settings({ onClose, onSaved }) {
               )}
             </button>
           </div>
+          <a href="https://console.groq.com/keys" target="_blank" rel="noopener" className="key-hint">Need a key? Get one here</a>
         </div>
 
         <div className="field-group">

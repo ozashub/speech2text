@@ -383,6 +383,16 @@ kbd {
   color: var(--text-2);
 }
 
+.key-hint {
+  font-size: 11px;
+  color: var(--text-3);
+  transition: color 0.15s;
+}
+
+.key-hint:hover {
+  color: var(--accent);
+}
+
 .field-group select {
   width: 100%;
   padding: 11px 14px;
