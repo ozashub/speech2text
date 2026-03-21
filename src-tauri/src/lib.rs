@@ -349,6 +349,10 @@ unsafe extern "system" fn kb_proc(
                         if !s.active && s.keys.iter().all(|k| s.pressed.contains(k)) {
                             s.active = true;
                             let _ = s.app.emit("start-recording", ());
+                            if let Some(w) = s.app.get_webview_window("overlay") {
+                                let _ = w.show();
+                            }
+                            let _ = s.app.emit("overlay-state", "recording");
                         }
                     } else if msg == win::WM_KEYUP || msg == win::WM_SYSKEYUP {
                         s.pressed.remove(&vk);
@@ -432,21 +436,22 @@ pub fn run() {
                 tauri::WebviewUrl::App("overlay.html".into()),
             )
             .title("")
-            .inner_size(300.0, 56.0)
+            .inner_size(220.0, 48.0)
             .decorations(false)
             .transparent(true)
             .always_on_top(true)
             .skip_taskbar(true)
             .visible(false)
             .resizable(false)
+            .focused(false)
             .build()?;
 
             if let Ok(Some(monitor)) = overlay.current_monitor() {
                 let size = monitor.size();
                 let scale = monitor.scale_factor();
-                let x = (size.width as f64 / scale - 300.0) / 2.0;
+                let x = (size.width as f64 / scale - 220.0) / 2.0;
                 let _ = overlay.set_position(tauri::Position::Logical(
-                    tauri::LogicalPosition::new(x, 16.0),
+                    tauri::LogicalPosition::new(x, 8.0),
                 ));
             }
             let _ = overlay.set_ignore_cursor_events(true);
@@ -458,14 +463,6 @@ pub fn run() {
             start_hook(app.handle().clone(), keybind);
 
             Ok(())
-        })
-        .on_window_event(|window, event| {
-            if window.label() == "main" {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                    api.prevent_close();
-                    let _ = window.hide();
-                }
-            }
         })
         .invoke_handler(tauri::generate_handler![
             save_api_key,

@@ -69,7 +69,6 @@ export default function App() {
 
     setRecording(true);
     stat("recording", "rec");
-    invoke("show_overlay", { state: "recording" }).catch(() => {});
   }, []);
 
   const stop = useCallback(() => {
@@ -127,10 +126,10 @@ export default function App() {
       <header className="titlebar" data-tauri-drag-region>
         <span className="app-name" data-tauri-drag-region>speech2text</span>
         <div className="win-controls">
-          <button className="win-btn" onClick={() => appWindow.minimize()}>
+          <button className="win-btn" onClick={() => appWindow.hide()}>
             <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
           </button>
-          <button className="win-btn win-close" onClick={() => appWindow.hide()}>
+          <button className="win-btn win-close" onClick={() => appWindow.close()}>
             <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" strokeWidth="1.2"/></svg>
           </button>
         </div>
