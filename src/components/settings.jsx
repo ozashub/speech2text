@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { getVersion } from "@tauri-apps/api/app";
 
 const LANGS = [
   ["", "auto-detect"], ["en", "English"], ["es", "Spanish"], ["fr", "French"],
@@ -70,12 +71,14 @@ export default function Settings({ onClose, onSaved }) {
   const [keybind, setKeybind] = useState(["Control", "Shift"]);
   const [visible, setVisible] = useState(false);
   const [autostart, setAutostart] = useState(false);
+  const [version, setVersion] = useState("");
   const inputRef = useRef(null);
 
   useEffect(() => {
     invoke("load_language").then((l) => { if (l) setLang(l); }).catch(() => {});
     invoke("load_keybind").then((k) => { if (k?.length) setKeybind(k); }).catch(() => {});
     invoke("get_autostart").then(setAutostart).catch(() => {});
+    getVersion().then(setVersion).catch(() => {});
     setTimeout(() => inputRef.current?.focus(), 50);
   }, []);
 
@@ -150,6 +153,8 @@ export default function Settings({ onClose, onSaved }) {
           <button className="btn-save" onClick={save}>save</button>
           <button className="btn-cancel" onClick={onClose}>cancel</button>
         </div>
+
+        {version && <span className="version-label">v{version}</span>}
       </div>
     </div>
   );

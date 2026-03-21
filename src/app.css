@@ -522,3 +522,10 @@ kbd {
   transform: translateX(18px);
   background: white;
 }
+
+.version-label {
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+  display: block;
+}
