@@ -7,9 +7,9 @@
 }
 
 :root {
-  --bg: #000;
-  --surface: #111;
-  --surface-2: #191919;
+  --bg: #050505;
+  --surface: #0e0e0e;
+  --surface-2: #161616;
   --text: #eee;
   --text-2: #999;
   --text-3: #555;
@@ -19,6 +19,7 @@
   --danger: #ff4444;
   --danger-glow: rgba(255, 68, 68, 0.12);
   --success: #44cc66;
+  --grid: 20px;
 }
 
 html,
@@ -32,6 +33,26 @@ body,
   font-size: 13px;
   -webkit-font-smoothing: antialiased;
   user-select: none;
+  position: relative;
+}
+
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    conic-gradient(from 180deg at 50% 30%, #7c5cfc 0deg, #5b3dd4 90deg, #1a0a3e 180deg, #5b3dd4 270deg, #7c5cfc 360deg);
+  mask:
+    radial-gradient(ellipse 80% 60% at 50% 20%, white, transparent 70%),
+    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 / var(--grid) var(--grid);
+  -webkit-mask:
+    radial-gradient(ellipse 80% 60% at 50% 20%, white, transparent 70%),
+    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 / var(--grid) var(--grid);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .titlebar {
@@ -40,8 +61,11 @@ body,
   align-items: center;
   justify-content: space-between;
   padding: 0 12px 0 20px;
-  background: var(--surface);
+  background: rgba(14, 14, 14, 0.8);
+  backdrop-filter: blur(12px);
   -webkit-app-region: drag;
+  position: relative;
+  z-index: 2;
 }
 
 .app-name {
@@ -87,6 +111,8 @@ main {
   height: calc(100% - 40px - 48px);
   padding: 0 20px;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .visualizer {
@@ -111,14 +137,14 @@ main {
   height: 80px;
   border-radius: 50%;
   border: none;
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--text-3);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .rec-btn:hover {
@@ -223,6 +249,8 @@ footer {
   justify-content: space-between;
   padding: 0 20px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 kbd {
