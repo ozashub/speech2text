@@ -6,6 +6,14 @@
 
 <p align="center">Desktop speech-to-text powered by Groq's Whisper v3 API.<br>Record your voice, get the transcription pasted directly into whatever you're typing.</p>
 
+## Install
+
+```
+winget install ozas.speech2text
+```
+
+Or download the latest installer from the [releases page](https://github.com/ozashub/speech2text/releases).
+
 ## How it works
 
 1. Set your Groq API key in settings
