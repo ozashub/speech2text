@@ -29,27 +29,44 @@ body,
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
   font-size: 13px;
   -webkit-font-smoothing: antialiased;
   user-select: none;
   position: relative;
 }
 
-::selection { background: var(--accent); color: #fff; }
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
 
 #root::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
-  background:
-    conic-gradient(from 180deg at 50% 30%, #7c5cfc 0deg, #5b3dd4 90deg, #1a0a3e 180deg, #5b3dd4 270deg, #7c5cfc 360deg);
+  background: conic-gradient(
+    from 180deg at 50% 30%,
+    #7c5cfc 0deg,
+    #5b3dd4 90deg,
+    #1a0a3e 180deg,
+    #5b3dd4 270deg,
+    #7c5cfc 360deg
+  );
   mask:
     radial-gradient(ellipse 80% 60% at 50% 20%, white, transparent 70%),
-    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 / var(--grid) var(--grid);
+    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 /
+      var(--grid) var(--grid);
   -webkit-mask:
     radial-gradient(ellipse 80% 60% at 50% 20%, white, transparent 70%),
-    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 / var(--grid) var(--grid);
+    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 /
+      var(--grid) var(--grid);
   mask-composite: intersect;
   -webkit-mask-composite: source-in;
   opacity: 0.2;
@@ -102,7 +119,10 @@ body,
   color: var(--text-2);
 }
 
-.win-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.win-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .win-close:hover {
   background: var(--danger);
   color: white;
@@ -147,24 +167,33 @@ main {
   align-items: center;
   justify-content: center;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .rec-btn:hover {
   color: var(--accent);
   background: var(--surface-2);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 0 2px var(--accent-glow);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 2px var(--accent-glow);
   transform: scale(1.04);
 }
 
 .rec-btn.on {
   color: white;
   background: var(--danger);
-  box-shadow: 0 0 32px var(--danger-glow), 0 0 0 0 transparent;
+  box-shadow:
+    0 0 32px var(--danger-glow),
+    0 0 0 0 transparent;
   animation: glow-pulse 1.6s ease-in-out infinite;
 }
 
-.rec-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.rec-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 .rec-btn.busy {
   color: var(--accent);
   background: var(--surface);
@@ -174,16 +203,33 @@ main {
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 24px var(--danger-glow); transform: scale(1); }
-  50% { box-shadow: 0 0 48px rgba(255, 68, 68, 0.25); transform: scale(1.03); }
+  0%,
+  100% {
+    box-shadow: 0 0 24px var(--danger-glow);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 48px rgba(255, 68, 68, 0.25);
+    transform: scale(1.03);
+  }
 }
 
 @keyframes spin-glow {
-  0% { box-shadow: 2px 0 16px var(--accent-glow); }
-  25% { box-shadow: 0 2px 16px var(--accent-glow); }
-  50% { box-shadow: -2px 0 16px var(--accent-glow); }
-  75% { box-shadow: 0 -2px 16px var(--accent-glow); }
-  100% { box-shadow: 2px 0 16px var(--accent-glow); }
+  0% {
+    box-shadow: 2px 0 16px var(--accent-glow);
+  }
+  25% {
+    box-shadow: 0 2px 16px var(--accent-glow);
+  }
+  50% {
+    box-shadow: -2px 0 16px var(--accent-glow);
+  }
+  75% {
+    box-shadow: 0 -2px 16px var(--accent-glow);
+  }
+  100% {
+    box-shadow: 2px 0 16px var(--accent-glow);
+  }
 }
 
 .status {
@@ -193,9 +239,15 @@ main {
   transition: color 0.3s ease-out;
 }
 
-.status.rec { color: var(--danger); }
-.status.done { color: var(--success); }
-.status.err { color: var(--danger); }
+.status.rec {
+  color: var(--danger);
+}
+.status.done {
+  color: var(--success);
+}
+.status.err {
+  color: var(--danger);
+}
 
 .history {
   flex: 1;
@@ -230,8 +282,12 @@ main {
   transition: color 0.15s;
 }
 
-.clear-btn:hover { color: var(--text-2); }
-.clear-btn:active { transform: scale(0.95); }
+.clear-btn:hover {
+  color: var(--text-2);
+}
+.clear-btn:active {
+  transform: scale(0.95);
+}
 
 .history-list {
   flex: 1;
@@ -241,10 +297,19 @@ main {
   gap: 6px;
 }
 
-.history-list::-webkit-scrollbar { width: 3px; }
-.history-list::-webkit-scrollbar-thumb { background: var(--text-3); border-radius: 2px; }
-.history-list::-webkit-scrollbar-track { background: transparent; }
-.history-list { scrollbar-color: var(--text-3) transparent; }
+.history-list::-webkit-scrollbar {
+  width: 3px;
+}
+.history-list::-webkit-scrollbar-thumb {
+  background: var(--text-3);
+  border-radius: 2px;
+}
+.history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.history-list {
+  scrollbar-color: var(--text-3) transparent;
+}
 
 .history-item {
   padding: 10px 14px;
@@ -254,8 +319,12 @@ main {
   cursor: pointer;
 }
 
-.history-item:hover { background: var(--surface-2); }
-.history-item:active { transform: scale(0.99); }
+.history-item:hover {
+  background: var(--surface-2);
+}
+.history-item:active {
+  transform: scale(0.99);
+}
 
 .history-item.latest {
   background: var(--surface-2);
@@ -330,8 +399,13 @@ kbd {
   background: var(--surface);
   color: var(--text-2);
 }
-.gear-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.gear-btn:active { transform: scale(0.92); }
+.gear-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.gear-btn:active {
+  transform: scale(0.92);
+}
 
 .overlay {
   position: fixed;
@@ -347,8 +421,12 @@ kbd {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .overlay.out {
@@ -359,7 +437,9 @@ kbd {
 .overlay.out .modal {
   transform: translateY(8px) scale(0.97);
   opacity: 0;
-  transition: transform 0.15s ease-in, opacity 0.15s ease-in;
+  transition:
+    transform 0.15s ease-in,
+    opacity 0.15s ease-in;
 }
 
 .modal {
@@ -376,8 +456,14 @@ kbd {
 }
 
 @keyframes modal-up {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal h2 {
@@ -459,8 +545,12 @@ kbd {
   transition: color 0.15s;
 }
 
-.toggle-vis:hover { color: var(--text-2); }
-.toggle-vis:active { transform: translateY(-50%) scale(0.9); }
+.toggle-vis:hover {
+  color: var(--text-2);
+}
+.toggle-vis:active {
+  transform: translateY(-50%) scale(0.9);
+}
 
 .field-hint {
   display: block;
@@ -498,7 +588,9 @@ kbd {
   transition: color 0.15s;
 }
 
-.share-btn:hover { color: var(--accent); }
+.share-btn:hover {
+  color: var(--accent);
+}
 
 .field-group select {
   width: 100%;
@@ -570,7 +662,9 @@ kbd {
 .btn-cancel:hover {
   color: var(--text);
 }
-.btn-cancel:active { transform: scale(0.97); }
+.btn-cancel:active {
+  transform: scale(0.97);
+}
 
 .keybind-btn {
   width: 100%;
@@ -589,7 +683,10 @@ kbd {
 .keybind-btn:hover {
   box-shadow: 0 0 0 2px rgba(124, 92, 252, 0.3);
 }
-.keybind-btn:focus-visible { box-shadow: 0 0 0 2px var(--accent); outline: none; }
+.keybind-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+  outline: none;
+}
 
 .keybind-btn.active {
   box-shadow: 0 0 0 2px var(--accent);
@@ -598,8 +695,15 @@ kbd {
 }
 
 @keyframes keybind-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px var(--accent); }
-  50% { box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(124, 92, 252, 0.2); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px var(--accent),
+      0 0 12px rgba(124, 92, 252, 0.2);
+  }
 }
 
 .toggle-row {
@@ -627,9 +731,16 @@ kbd {
   transition: background 0.2s;
   flex-shrink: 0;
 }
-.toggle:hover { box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.2); }
-.toggle:focus-visible { box-shadow: 0 0 0 2px var(--accent); outline: none; }
-.toggle:active { transform: scale(0.96); }
+.toggle:hover {
+  box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.2);
+}
+.toggle:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+  outline: none;
+}
+.toggle:active {
+  transform: scale(0.96);
+}
 
 .toggle.on {
   background: var(--accent);
@@ -643,7 +754,9 @@ kbd {
   height: 16px;
   border-radius: 50%;
   background: #777;
-  transition: transform 0.2s, background 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s;
 }
 
 .toggle.on .toggle-knob {
@@ -680,8 +793,13 @@ kbd {
   background: var(--surface-2);
   color: var(--text);
 }
-.update-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.update-btn:active { transform: scale(0.97); }
+.update-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.update-btn:active {
+  transform: scale(0.97);
+}
 
 .update-btn.accent {
   background: var(--accent);
@@ -736,8 +854,14 @@ kbd {
 }
 
 @keyframes slide-down {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .update-banner span {
@@ -764,8 +888,12 @@ kbd {
   transition: background 0.15s;
 }
 
-.update-banner button:hover { background: var(--accent-hover); }
-.update-banner button:active { transform: scale(0.97); }
+.update-banner button:hover {
+  background: var(--accent-hover);
+}
+.update-banner button:active {
+  transform: scale(0.97);
+}
 
 .update-banner button.dismiss {
   background: var(--surface-2);
@@ -790,7 +918,9 @@ kbd {
   transition: opacity 0.15s;
 }
 
-.edit-prompt-btn:hover { opacity: 1; }
+.edit-prompt-btn:hover {
+  opacity: 1;
+}
 
 .prompt-overlay {
   position: fixed;
@@ -812,7 +942,9 @@ kbd {
 .prompt-overlay.out .prompt-editor {
   transform: translateY(8px) scale(0.97);
   opacity: 0;
-  transition: transform 0.2s ease-in, opacity 0.2s ease-in;
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s ease-in;
 }
 
 .prompt-editor {
@@ -848,7 +980,9 @@ kbd {
   transition: color 0.15s;
 }
 
-.prompt-reset:hover { color: var(--accent); }
+.prompt-reset:hover {
+  color: var(--accent);
+}
 
 .prompt-editor textarea {
   width: 100%;

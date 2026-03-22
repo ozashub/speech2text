@@ -28,7 +28,9 @@ function Overlay() {
         timersRef.current.push(t1);
       }
     });
-    return () => { unlisten.then((f) => f()); };
+    return () => {
+      unlisten.then((f) => f());
+    };
   }, []);
 
   if (!state) return null;
@@ -38,11 +40,28 @@ function Overlay() {
       {state === "recording" && <div className="dot pulse" />}
       {state === "transcribing" && <div className="dot spinner" />}
       {state === "done" && (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#44cc66" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#44cc66"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <polyline points="20 6 9 17 4 12" />
         </svg>
       )}
-      <span>{state === "recording" ? "Recording" : state === "transcribing" ? "Transcribing..." : state === "done" ? "Done" : state}</span>
+      <span>
+        {state === "recording"
+          ? "Recording"
+          : state === "transcribing"
+            ? "Transcribing..."
+            : state === "done"
+              ? "Done"
+              : state}
+      </span>
     </div>
   );
 }

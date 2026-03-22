@@ -1,4 +1,6 @@
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -19,7 +21,13 @@ html, body, #root {
   background: #111;
   border-radius: 18px;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: #aaa;
@@ -32,13 +40,25 @@ html, body, #root {
 }
 
 @keyframes pop-in {
-  from { transform: translateY(-20px) scale(0.9); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+  from {
+    transform: translateY(-20px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes pop-out {
-  from { transform: translateY(0) scale(1); opacity: 1; }
-  to { transform: translateY(-20px) scale(0.9); opacity: 0; }
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px) scale(0.9);
+    opacity: 0;
+  }
 }
 
 .dot {
@@ -49,25 +69,36 @@ html, body, #root {
 }
 
 .dot.pulse {
-  background: #ff4444;
+  background: #e84040;
   animation: blink 0.9s ease-in-out infinite;
 }
 
 .dot.spinner {
   background: transparent;
-  border: 2px solid rgba(124, 92, 252, 0.2);
+  border: 2px solid rgba(124, 92, 252, 0.15);
   border-top-color: #7c5cfc;
   animation: spin 0.6s linear infinite;
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.pill.recording { color: #ff8888; }
-.pill.done { color: #88ee99; }
+.pill.recording {
+  color: #f08080;
+}
+.pill.done {
+  color: #7be08a;
+}

@@ -6,11 +6,11 @@ Follow the global `~/.claude/CLAUDE.md` for all coding rules. This file covers p
 
 Tauri v2 desktop app. Rust backend, React + Vite frontend.
 
-- `src-tauri/src/lib.rs` — all Rust logic: Groq API, clipboard paste (enigo), raw Win32 keyboard hook (WH_KEYBOARD_LL), system tray, overlay window, config persistence
+- `src-tauri/src/lib.rs` — all Rust logic: Groq API, clipboard paste (enigo), raw Win32 keyboard hook (WH_KEYBOARD_LL), system tray, overlay window, config persistence, enhance LLM pass, encrypted key sharing
 - `src-tauri/src/main.rs` — just calls `run()`
 - `src/app.jsx` — main React app: recording, visualizer, transcript history, settings toggle
 - `src/components/visualizer.jsx` — canvas-based audio bar visualizer with lerped smoothing
-- `src/components/settings.jsx` — settings modal: API key, language, keybind capture
+- `src/components/settings.jsx` — settings modal: API key, language, keybind capture, enhance toggle, custom prompt editor, key sharing, update checker
 - `src/overlay.jsx` — Dynamic Island overlay: shows recording/transcribing/done at top of screen
 - `src/overlay.css` — overlay pill styling and animations
 - `src/app.css` — main app dark theme
@@ -22,7 +22,9 @@ Two Tauri windows: `main` (the app) and `overlay` (transparent always-on-top sta
 - Rust (Tauri v2, reqwest, arboard, enigo, raw Win32 FFI for keyboard hook)
 - React 19 + Vite 6 (multi-page: index.html + overlay.html)
 - Groq Whisper Large v3 API for transcription
+- Groq llama-3.1-8b-instant for enhance mode
 - NSIS installer for Windows distribution
+- Cloudflare Worker + KV for encrypted key sharing
 
 ## Building
 
@@ -39,7 +41,7 @@ TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/speech2text.key)" TAURI_SIGNING_PRIVAT
 
 ## Releasing a New Version
 
-1. Bump `version` in `src-tauri/tauri.conf.json`
+1. Bump `version` in `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`
 2. Build with signing key (see above)
 3. Create `latest.json` with the new version, signature from `.exe.sig`, and download URL
 4. `gh release create vX.Y.Z` with the `.exe`, `.exe.sig`, and `latest.json`
@@ -49,7 +51,7 @@ The signing key is at `~/.tauri/speech2text.key`. Never commit it.
 
 ## Config
 
-User config stored at `AppConfigDir/config.json` (Tauri resolves this per-platform). Contains `api_key`, `language`, `keybind`.
+User config stored at `AppConfigDir/config.json` (Tauri resolves this per-platform). Contains `api_key`, `language`, `keybind`, `enhance`, `enhance_prompt`.
 
 ## Key Behaviors
 
@@ -59,3 +61,9 @@ User config stored at `AppConfigDir/config.json` (Tauri resolves this per-platfo
 - Default keybind is Ctrl+Shift (hold to record, release to transcribe+paste)
 - Mic button in the app toggles (click start, click stop)
 - Overlay window is transparent, always-on-top, ignores cursor events
+- Overlay follows active monitor (multi-monitor support)
+- Enhance mode sends transcription through LLM for cleanup (filler removal, grammar, formatting)
+- Custom enhance prompt is user-editable and persisted in config
+- Key sharing: AES-256-GCM encrypted, stored in Cloudflare KV, 5-min TTL, one-time read
+- Deep link protocol: `speech2text://` for key import from shared links
+- Auto-updater checks on startup, prompts user, shows download progress
