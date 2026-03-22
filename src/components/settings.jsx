@@ -134,13 +134,11 @@ export default function Settings({ onClose, onSaved }) {
 
   const save = async () => {
     try {
-      await Promise.all([
-        key.trim() ? invoke("save_api_key", { key: key.trim() }) : Promise.resolve(),
-        invoke("save_language", { language: lang }),
-        invoke("save_keybind", { keys: keybind }),
-        invoke("set_autostart", { enabled: autostart }),
-        invoke("save_enhance", { enabled: enhance }),
-      ]);
+      if (key.trim()) await invoke("save_api_key", { key: key.trim() });
+      await invoke("save_language", { language: lang });
+      await invoke("save_keybind", { keys: keybind });
+      await invoke("save_enhance", { enabled: enhance });
+      await invoke("set_autostart", { enabled: autostart });
       onSaved();
       animateClose(onClose);
     } catch {}
