@@ -404,6 +404,14 @@ kbd {
 .toggle-vis:hover { color: var(--text-2); }
 .toggle-vis:active { transform: translateY(-50%) scale(0.9); }
 
+.field-hint {
+  display: block;
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
 .key-hint {
   font-size: 11px;
   color: var(--text-3);

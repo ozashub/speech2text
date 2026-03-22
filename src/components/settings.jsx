@@ -71,6 +71,7 @@ export default function Settings({ onClose, onSaved }) {
   const [keybind, setKeybind] = useState(["Control", "Shift"]);
   const [visible, setVisible] = useState(false);
   const [autostart, setAutostart] = useState(false);
+  const [enhance, setEnhance] = useState(false);
   const [version, setVersion] = useState("");
   const [updateStatus, setUpdateStatus] = useState("");
   const [updateProgress, setUpdateProgress] = useState(-1);
@@ -87,6 +88,7 @@ export default function Settings({ onClose, onSaved }) {
     invoke("load_language").then((l) => { if (l) setLang(l); }).catch(() => {});
     invoke("load_keybind").then((k) => { if (k?.length) setKeybind(k); }).catch(() => {});
     invoke("get_autostart").then(setAutostart).catch(() => {});
+    invoke("load_enhance").then(setEnhance).catch(() => {});
     getVersion().then(setVersion).catch(() => {});
     setTimeout(() => inputRef.current?.focus(), 50);
   }, []);
@@ -131,6 +133,7 @@ export default function Settings({ onClose, onSaved }) {
       await invoke("save_language", { language: lang });
       await invoke("save_keybind", { keys: keybind });
       await invoke("set_autostart", { enabled: autostart });
+      await invoke("save_enhance", { enabled: enhance });
       onSaved();
     } catch {}
   };
@@ -193,6 +196,20 @@ export default function Settings({ onClose, onSaved }) {
           </button>
         </div>
 
+        <div className="field-group toggle-row">
+          <div>
+            <label>Enhance</label>
+            <span className="field-hint">Cleans up filler words, fixes grammar, structures text. Adds slight latency.</span>
+          </div>
+          <button
+            className={`toggle ${enhance ? "on" : ""}`}
+            onClick={() => setEnhance(!enhance)}
+            type="button"
+          >
+            <span className="toggle-knob" />
+          </button>
+        </div>
+
         <div className="modal-actions">
           <button className="btn-save" onClick={save}>Save</button>
           <button className="btn-cancel" onClick={() => animateClose(onClose)}>Cancel</button>
@@ -205,7 +222,7 @@ export default function Settings({ onClose, onSaved }) {
           )}
           {updateStatus === "checking" && <span className="update-status">Checking...</span>}
           {updateStatus === "available" && (
-            <button className="update-btn accent" type="button" onClick={installUpdate}>Update Available — Install Now</button>
+            <button className="update-btn accent" type="button" onClick={installUpdate}>Update Available - Install Now</button>
           )}
           {updateStatus === "downloading" && (
             <div className="update-progress">

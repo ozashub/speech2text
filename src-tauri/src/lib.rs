@@ -86,6 +86,7 @@ struct Config {
     api_key: Option<String>,
     language: Option<String>,
     keybind: Option<Vec<String>>,
+    enhance: Option<bool>,
 }
 
 fn config_path(app: &tauri::AppHandle) -> PathBuf {
@@ -151,6 +152,18 @@ fn load_keybind(app: tauri::AppHandle) -> Result<Vec<String>, String> {
 }
 
 #[tauri::command]
+fn save_enhance(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    let mut c = read_config(&app);
+    c.enhance = Some(enabled);
+    write_config(&app, &c)
+}
+
+#[tauri::command]
+fn load_enhance(app: tauri::AppHandle) -> Result<bool, String> {
+    Ok(read_config(&app).enhance.unwrap_or(false))
+}
+
+#[tauri::command]
 fn set_hook_enabled(enabled: bool) -> Result<(), String> {
     if let Ok(mut g) = HOOK.lock() {
         if let Some(ref mut s) = *g {
@@ -176,7 +189,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
 
     let mut form = multipart::Form::new()
         .text("model", "whisper-large-v3")
-        .text("prompt", "Remove filler words. Structure output cleanly. Fix obvious misspellings of real names and products.")
+        .text("prompt", "Groq, GitHub, Tauri, Cloudflare, Discord, Claude, ChatGPT, JavaScript, TypeScript, Python, React, Node.js")
         .part("file", part);
 
     if let Some(ref lang) = cfg.language {
@@ -208,7 +221,46 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         text: String,
     }
     let r: T = resp.json().await.map_err(|e| e.to_string())?;
-    Ok(r.text)
+    let text = r.text;
+
+    if !cfg.enhance.unwrap_or(false) {
+        return Ok(text);
+    }
+
+    let body = serde_json::json!({
+        "model": "llama-3.3-70b-versatile",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a text cleanup tool. You receive raw speech-to-text transcriptions and return a cleaned version. Rules:\n\n- Remove filler words (um, uh, like, you know, so, basically, actually, right, I mean, kind of, sort of)\n- Fix obvious grammar mistakes but keep the speaker's natural voice and word choices\n- If items are listed or numbered (e.g. \"first X second Y third Z\"), format each on its own line with proper numbering\n- Preserve the original meaning exactly. Do not add, rephrase, or summarize\n- Do not add greetings, sign-offs, or any text that wasn't spoken\n- Return ONLY the cleaned text, nothing else. No quotes, no explanations, no preamble"
+            },
+            {
+                "role": "user",
+                "content": text
+            }
+        ],
+        "temperature": 0.1,
+        "max_tokens": 2048
+    });
+
+    let llm_resp = client
+        .post("https://api.groq.com/openai/v1/chat/completions")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .body(body.to_string())
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if !llm_resp.status().is_success() {
+        return Ok(text);
+    }
+
+    let llm_json: serde_json::Value = llm_resp.json().await.map_err(|e| e.to_string())?;
+    match llm_json["choices"][0]["message"]["content"].as_str() {
+        Some(cleaned) if !cleaned.trim().is_empty() => Ok(cleaned.trim().to_string()),
+        _ => Ok(text),
+    }
 }
 
 #[tauri::command]
@@ -467,6 +519,8 @@ pub fn run() {
             load_language,
             save_keybind,
             load_keybind,
+            save_enhance,
+            load_enhance,
             set_hook_enabled,
             get_autostart,
             set_autostart,
