@@ -216,7 +216,7 @@ export default function App() {
   }, [start, stop]);
 
   return (
-    <>
+    <div className="shell">
       <header className="titlebar" data-tauri-drag-region>
         <span className="app-name" data-tauri-drag-region>
           Speech2Text
@@ -372,6 +372,6 @@ export default function App() {
           }}
         />
       )}
-    </>
+    </div>
   );
 }

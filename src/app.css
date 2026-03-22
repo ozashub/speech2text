@@ -31,6 +31,13 @@ body,
 #root {
   height: 100%;
   overflow: hidden;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   font-family:
