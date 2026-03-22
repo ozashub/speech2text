@@ -542,6 +542,14 @@ pub fn run() {
             tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None)
         )
         .plugin(tauri_plugin_deep_link::init())
+        .on_window_event(|window, event| {
+            if window.label() == "main" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+        })
         .setup(|app| {
             use tauri::menu::{ MenuBuilder, MenuItem };
             use tauri::tray::{ MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent };
@@ -597,6 +605,14 @@ pub fn run() {
                 .build()?;
 
             let _ = overlay.set_ignore_cursor_events(true);
+
+            let autostarted = std::env::args().any(|a| a.contains("autostart"));
+            if !autostarted {
+                if let Some(w) = app.get_webview_window("main") {
+                    let _ = w.show();
+                    let _ = w.set_focus();
+                }
+            }
 
             let keys = read_config(&app.handle()).keybind.unwrap_or_else(||
                 vec!["Control".into(), "Shift".into()]

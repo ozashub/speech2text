@@ -222,14 +222,14 @@ export default function App() {
           Speech2Text
         </span>
         <div className="win-controls">
-          <button className="win-btn" onClick={() => appWindow.hide()}>
+          <button className="win-btn" onClick={() => appWindow.minimize()}>
             <svg width="10" height="1" viewBox="0 0 10 1">
               <rect width="10" height="1" fill="currentColor" />
             </svg>
           </button>
           <button
             className="win-btn win-close"
-            onClick={() => invoke("exit_app")}
+            onClick={() => appWindow.hide()}
           >
             <svg width="10" height="10" viewBox="0 0 10 10">
               <path
