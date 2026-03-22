@@ -280,7 +280,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         return Ok(text);
     }
 
-    let estimated_tokens = (text.len() / 4).max(32) + 16;
+    let estimated_tokens = ((text.len() / 3) * 2).max(128);
     let base_prompt = cfg.enhance_prompt.unwrap_or_else(|| DEFAULT_ENHANCE_PROMPT.to_string());
     let prompt = if word_fixes.trim().is_empty() {
         base_prompt
