@@ -176,6 +176,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
 
     let mut form = multipart::Form::new()
         .text("model", "whisper-large-v3")
+        .text("prompt", "Remove filler words. Structure output cleanly. Fix obvious misspellings of real names and products.")
         .part("file", part);
 
     if let Some(ref lang) = cfg.language {
@@ -439,7 +440,7 @@ pub fn run() {
                 tauri::WebviewUrl::App("overlay.html".into()),
             )
             .title("")
-            .inner_size(320.0, 80.0)
+            .inner_size(320.0, 100.0)
             .decorations(false)
             .transparent(true)
             .shadow(false)
