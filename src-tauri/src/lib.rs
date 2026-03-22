@@ -606,11 +606,14 @@ pub fn run() {
 
             let _ = overlay.set_ignore_cursor_events(true);
 
-            let autostarted = std::env::args().any(|a| a.contains("autostart"));
-            if !autostarted {
-                if let Some(w) = app.get_webview_window("main") {
-                    let _ = w.show();
-                    let _ = w.set_focus();
+            {
+                use tauri_plugin_autostart::ManagerExt;
+                let silent = app.autolaunch().is_enabled().unwrap_or(false);
+                if !silent {
+                    if let Some(w) = app.get_webview_window("main") {
+                        let _ = w.show();
+                        let _ = w.set_focus();
+                    }
                 }
             }
 
