@@ -135,7 +135,8 @@ body,
 main {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 40px - 48px);
+  flex: 1;
+  min-height: 0;
   padding: 0 20px;
   overflow: hidden;
   position: relative;
@@ -369,9 +370,10 @@ main {
   text-align: center;
   font-size: 11px;
   color: var(--text-3);
-  padding: 6px 0;
+  padding: 8px 0 4px;
   flex-shrink: 0;
   letter-spacing: 0.02em;
+  margin-bottom: 0;
 }
 
 footer {

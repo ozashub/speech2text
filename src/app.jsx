@@ -334,7 +334,7 @@ export default function App() {
 
       {(stats[0] > 0 || stats[1] > 0) && (
         <div className="stats-bar">
-          {stats[0].toLocaleString()} words · {Math.round(stats[2] / 60)} min recorded · {stats[1]} recordings
+          {stats[0].toLocaleString()} word{stats[0] !== 1 ? "s" : ""} · {Math.round(stats[2] / 60)} min recorded · {stats[1]} recording{stats[1] !== 1 ? "s" : ""}
         </div>
       )}
 
