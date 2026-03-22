@@ -53,8 +53,10 @@ export default function App() {
       source.connect(analyser);
       analyserRef.current = analyser;
       setMicReady(true);
+      appWindow.show();
     }).catch(() => {
       stat("Mic denied", "err");
+      appWindow.show();
     });
   }, []);
 

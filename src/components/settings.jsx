@@ -218,8 +218,7 @@ export default function Settings({ onClose, onSaved }) {
           <button className="btn-cancel" onClick={() => animateClose(onClose)}>Cancel</button>
         </div>
 
-        <div className="settings-section">
-          <div className="update-section">
+        <div className="update-section">
             {version && <span className="version-label">v{version}</span>}
             {updateStatus === "" && (
               <button className="update-btn" type="button" onClick={checkUpdate}>Check for Updates</button>
@@ -237,7 +236,6 @@ export default function Settings({ onClose, onSaved }) {
             {updateStatus === "installing" && <span className="update-status">Installing...</span>}
             {updateStatus === "uptodate" && <span className="update-status">You're on the latest version</span>}
             {updateStatus === "error" && <span className="update-status err">Update failed</span>}
-          </div>
         </div>
         </>}
       </div>
