@@ -21,3 +21,6 @@ npm-debug.log*
 *.sln
 *.sw?
 .DS_Store
+*.key
+*.pem
+.env

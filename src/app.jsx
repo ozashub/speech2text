@@ -156,7 +156,12 @@ export default function App() {
 
     const u1 = listen("start-recording", () => start());
     const u2 = listen("stop-recording", () => stop());
-    return () => { u1.then((f) => f()); u2.then((f) => f()); };
+    const u3 = listen("key-imported", () => {
+      setHasKey(true);
+      stat("Key imported", "done");
+      setTimeout(() => stat("Ready", ""), 2000);
+    });
+    return () => { u1.then((f) => f()); u2.then((f) => f()); u3.then((f) => f()); };
   }, [start, stop]);
 
   return (

@@ -77,6 +77,8 @@ export default function Settings({ onClose, onSaved }) {
   const [updateProgress, setUpdateProgress] = useState(-1);
   const [closing, setClosing] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [shareStatus, setShareStatus] = useState("");
+  const [savedKey, setSavedKey] = useState("");
   const updateRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -87,6 +89,7 @@ export default function Settings({ onClose, onSaved }) {
 
   useEffect(() => {
     Promise.all([
+      invoke("load_api_key").then((k) => { if (k) setSavedKey(k); }).catch(() => {}),
       invoke("load_language").then((l) => { if (l) setLang(l); }).catch(() => {}),
       invoke("load_keybind").then((k) => { if (k?.length) setKeybind(k); }).catch(() => {}),
       invoke("get_autostart").then(setAutostart).catch(() => {}),
@@ -144,6 +147,50 @@ export default function Settings({ onClose, onSaved }) {
     } catch {}
   };
 
+  const shareKey = async () => {
+    const keyToShare = key.trim() || savedKey;
+    if (!keyToShare) { setShareStatus("No key to share"); return; }
+
+    setShareStatus("Encrypting...");
+    try {
+      const passphrase = crypto.getRandomValues(new Uint8Array(16));
+      const pass = Array.from(passphrase, b => b.toString(36).padStart(2, "0")).join("").slice(0, 24);
+
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]
+      );
+      const aesKey = await crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+        keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt"]
+      );
+      const encrypted = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv }, aesKey, new TextEncoder().encode(keyToShare)
+      );
+
+      const combined = new Uint8Array([...salt, ...iv, ...new Uint8Array(encrypted)]);
+      const b64 = btoa(String.fromCharCode(...combined));
+
+      const resp = await fetch("https://speech2text.cc/api/store", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: b64 }),
+      });
+      const json = await resp.json();
+      if (!json.code) throw new Error("Store failed");
+
+      const link = `https://speech2text.cc/share#${json.code}${pass}`;
+      await navigator.clipboard.writeText(link);
+      setShareStatus("Link copied!");
+      setTimeout(() => setShareStatus(""), 3000);
+    } catch {
+      setShareStatus("Failed");
+      setTimeout(() => setShareStatus(""), 3000);
+    }
+  };
+
   return (
     <div className={`overlay ${closing ? "out" : ""}`} onClick={() => animateClose(onClose)}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -178,7 +225,12 @@ export default function Settings({ onClose, onSaved }) {
                 )}
               </button>
             </div>
-            <a href="https://console.groq.com/keys" target="_blank" rel="noopener" className="key-hint">Need a key? Get one here.</a>
+            <div className="key-actions">
+              <a href="https://console.groq.com/keys" target="_blank" rel="noopener" className="key-hint">Need a key? Get one here.</a>
+              <button className="share-btn" type="button" onClick={shareKey}>
+                {shareStatus || "Share key"}
+              </button>
+            </div>
           </div>
 
           <div className="field-group">

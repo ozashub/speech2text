@@ -43,6 +43,11 @@
     ]
   },
   "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["speech2text"]
+      }
+    },
     "updater": {
       "active": true,
       "dialog": false,

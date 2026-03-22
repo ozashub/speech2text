@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::thread;
 use std::time::Duration;
-use tauri::{Emitter, Manager};
+use tauri::{Emitter, Listener, Manager};
 
 #[allow(non_snake_case)]
 mod win {
@@ -451,6 +451,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
+        .plugin(tauri_plugin_deep_link::init())
         .setup(|app| {
             use tauri::menu::{MenuBuilder, MenuItem};
             use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
@@ -511,6 +512,26 @@ pub fn run() {
                 .keybind
                 .unwrap_or_else(|| vec!["Control".into(), "Shift".into()]);
             spawn_hook(app.handle().clone(), keys);
+
+            let handle = app.handle().clone();
+            app.handle().listen("deep-link://new-url", move |event| {
+                let payload = event.payload().to_string();
+                if let Some(key) = payload.strip_prefix("\"speech2text://import-key/")
+                    .and_then(|s| s.strip_suffix('"'))
+                {
+                    let decoded = urlencoding::decode(key).unwrap_or_default().to_string();
+                    if !decoded.is_empty() {
+                        let mut c = read_config(&handle);
+                        c.api_key = Some(decoded);
+                        let _ = write_config(&handle, &c);
+                        let _ = handle.emit("key-imported", ());
+                        if let Some(w) = handle.get_webview_window("main") {
+                            let _ = w.show();
+                            let _ = w.set_focus();
+                        }
+                    }
+                }
+            });
 
             Ok(())
         })
