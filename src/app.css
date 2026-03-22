@@ -321,15 +321,15 @@ kbd {
 }
 
 .modal {
-  background: var(--surface);
-  border-radius: 16px;
-  padding: 28px;
-  width: 320px;
+  background: #111;
+  border-radius: 14px;
+  padding: 24px;
+  width: 340px;
   cursor: default;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.6);
+  gap: 0;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
   animation: modal-up 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -339,10 +339,24 @@ kbd {
 }
 
 .modal h2 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
+  margin-bottom: 20px;
+}
+
+.settings-section {
+  padding: 14px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
 }
 
 .field-group {
@@ -353,8 +367,10 @@ kbd {
 
 .field-group label {
   font-size: 11px;
-  color: var(--text-3);
-  letter-spacing: 0.3px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .input-row {
@@ -406,15 +422,16 @@ kbd {
 
 .field-hint {
   display: block;
-  font-size: 10px;
-  color: var(--text-3);
-  margin-top: 2px;
+  font-size: 11px;
+  color: #666;
+  margin-top: 1px;
   font-weight: 400;
+  line-height: 1.4;
 }
 
 .key-hint {
   font-size: 11px;
-  color: var(--text-3);
+  color: #666;
   transition: color 0.15s;
 }
 
@@ -452,46 +469,44 @@ kbd {
 .modal-actions {
   display: flex;
   gap: 8px;
-  justify-content: flex-end;
-  padding-top: 4px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 4px;
 }
 
 .btn-save {
-  padding: 9px 24px;
+  flex: 1;
+  padding: 10px 0;
   background: var(--accent);
   border: none;
   border-radius: 8px;
   color: white;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
-  box-shadow: 0 2px 12px rgba(124, 92, 252, 0.3);
 }
 
 .btn-save:hover {
   background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.4);
 }
 
 .btn-save:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 .btn-cancel {
-  padding: 9px 18px;
-  background: var(--surface-2);
+  padding: 10px 16px;
+  background: transparent;
   border: none;
   border-radius: 8px;
-  color: var(--text-2);
+  color: #666;
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: color 0.15s;
 }
 
 .btn-cancel:hover {
-  background: #222;
   color: var(--text);
 }
 .btn-cancel:active { transform: scale(0.97); }
@@ -530,13 +545,21 @@ kbd {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle-row label {
+  text-transform: none;
+  font-size: 13px;
+  color: var(--text);
+  letter-spacing: 0;
 }
 
 .toggle {
   width: 40px;
   height: 22px;
   border-radius: 11px;
-  background: var(--surface-2);
+  background: #2a2a2a;
   border: none;
   cursor: pointer;
   position: relative;
@@ -558,13 +581,8 @@ kbd {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--text-2);
+  background: #777;
   transition: transform 0.2s, background 0.2s;
-}
-
-.no-transition .toggle,
-.no-transition .toggle-knob {
-  transition: none !important;
 }
 
 .toggle.on .toggle-knob {
