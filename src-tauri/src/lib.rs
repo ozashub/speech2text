@@ -8,10 +8,17 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 use std::thread;
 use std::time::Duration;
 use tauri::{Emitter, Listener, Manager};
+
+static HTTP: LazyLock<reqwest::Client> = LazyLock::new(|| {
+    reqwest::Client::builder()
+        .timeout(Duration::from_secs(30))
+        .build()
+        .expect("http client")
+});
 
 #[allow(non_snake_case)]
 mod win {
@@ -198,11 +205,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         }
     }
 
-    let client = reqwest::Client::builder()
-        .timeout(Duration::from_secs(30))
-        .build()
-        .map_err(|e| e.to_string())?;
-    let resp = client
+    let resp = HTTP
         .post("https://api.groq.com/openai/v1/audio/transcriptions")
         .header("Authorization", format!("Bearer {}", api_key))
         .multipart(form)
@@ -245,7 +248,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         "max_tokens": estimated_tokens
     });
 
-    let llm_resp = client
+    let llm_resp = HTTP
         .post("https://api.groq.com/openai/v1/chat/completions")
         .header("Authorization", format!("Bearer {}", api_key))
         .header("Content-Type", "application/json")
@@ -426,13 +429,16 @@ fn position_overlay_on_active_monitor(app: &tauri::AppHandle) {
 
 fn spawn_hook(app: tauri::AppHandle, keys: Vec<String>) {
     let vks: Vec<u32> = keys.iter().map(|k| key_to_vk(k)).collect();
-    *HOOK.lock().unwrap() = Some(HookState {
-        keys: vks,
-        pressed: HashSet::new(),
-        active: false,
-        enabled: true,
-        app,
-    });
+    {
+        let Ok(mut guard) = HOOK.lock() else { return };
+        *guard = Some(HookState {
+            keys: vks,
+            pressed: HashSet::new(),
+            active: false,
+            enabled: true,
+            app,
+        });
+    }
 
     thread::spawn(|| unsafe {
         let hook = win::SetWindowsHookExW(win::WH_KEYBOARD_LL, kb_proc, 0, 0);

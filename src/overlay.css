@@ -19,7 +19,7 @@ html, body, #root {
   background: #111;
   border-radius: 18px;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: #aaa;

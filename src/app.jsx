@@ -114,12 +114,11 @@ export default function App() {
     invoke("show_overlay", { state: "transcribing" }).catch(() => {});
 
     const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-    const bytes = new Uint8Array(await blob.arrayBuffer());
-    let bin = "";
-    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    const buf = await blob.arrayBuffer();
+    const b64 = btoa(new Uint8Array(buf).reduce((s, b) => s + String.fromCharCode(b), ""));
 
     try {
-      const text = await invoke("transcribe", { audioBase64: btoa(bin) });
+      const text = await invoke("transcribe", { audioBase64: b64 });
       if (sid !== sessionRef.current) return;
       setTranscript(text);
       setHistory((h) => [{ text, time: new Date() }, ...h].slice(0, 20));

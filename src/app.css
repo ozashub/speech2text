@@ -363,7 +363,7 @@ kbd {
 }
 
 .modal {
-  background: #111;
+  background: var(--surface);
   border-radius: 14px;
   padding: 24px;
   width: 340px;
