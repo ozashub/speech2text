@@ -76,21 +76,26 @@ export default function Settings({ onClose, onSaved }) {
   const [updateStatus, setUpdateStatus] = useState("");
   const [updateProgress, setUpdateProgress] = useState(-1);
   const [closing, setClosing] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const updateRef = useRef(null);
   const inputRef = useRef(null);
 
   const animateClose = (cb) => {
     setClosing(true);
-    setTimeout(cb, 150);
+    setTimeout(cb, 200);
   };
 
   useEffect(() => {
-    invoke("load_language").then((l) => { if (l) setLang(l); }).catch(() => {});
-    invoke("load_keybind").then((k) => { if (k?.length) setKeybind(k); }).catch(() => {});
-    invoke("get_autostart").then(setAutostart).catch(() => {});
-    invoke("load_enhance").then(setEnhance).catch(() => {});
-    getVersion().then(setVersion).catch(() => {});
-    setTimeout(() => inputRef.current?.focus(), 50);
+    Promise.all([
+      invoke("load_language").then((l) => { if (l) setLang(l); }).catch(() => {}),
+      invoke("load_keybind").then((k) => { if (k?.length) setKeybind(k); }).catch(() => {}),
+      invoke("get_autostart").then(setAutostart).catch(() => {}),
+      invoke("load_enhance").then(setEnhance).catch(() => {}),
+      getVersion().then(setVersion).catch(() => {}),
+    ]).then(() => {
+      setLoaded(true);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    });
   }, []);
 
   const checkUpdate = async () => {
@@ -129,12 +134,15 @@ export default function Settings({ onClose, onSaved }) {
 
   const save = async () => {
     try {
-      if (key.trim()) await invoke("save_api_key", { key: key.trim() });
-      await invoke("save_language", { language: lang });
-      await invoke("save_keybind", { keys: keybind });
-      await invoke("set_autostart", { enabled: autostart });
-      await invoke("save_enhance", { enabled: enhance });
+      await Promise.all([
+        key.trim() ? invoke("save_api_key", { key: key.trim() }) : Promise.resolve(),
+        invoke("save_language", { language: lang }),
+        invoke("save_keybind", { keys: keybind }),
+        invoke("set_autostart", { enabled: autostart }),
+        invoke("save_enhance", { enabled: enhance }),
+      ]);
       onSaved();
+      animateClose(onClose);
     } catch {}
   };
 
