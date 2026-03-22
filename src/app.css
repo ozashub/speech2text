@@ -36,6 +36,8 @@ body,
   position: relative;
 }
 
+::selection { background: var(--accent); color: #fff; }
+
 #root::before {
   content: '';
   position: fixed;
