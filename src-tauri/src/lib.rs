@@ -227,6 +227,8 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         return Ok(text);
     }
 
+    let estimated_tokens = (text.len() / 4).max(32) + 16;
+
     let body = serde_json::json!({
         "model": "llama-3.3-70b-versatile",
         "messages": [
@@ -240,7 +242,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
             }
         ],
         "temperature": 0.1,
-        "max_tokens": 2048
+        "max_tokens": estimated_tokens
     });
 
     let llm_resp = client
