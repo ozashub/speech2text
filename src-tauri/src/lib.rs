@@ -214,7 +214,7 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         .text("model", "whisper-large-v3")
         .text(
             "prompt",
-            "Groq, GitHub, Tauri, Cloudflare, Discord, Claude, ChatGPT, JavaScript, TypeScript, Python, React, Node.js"
+            "Groq, GitHub, Tauri, Cloudflare, Discord, Claude, ChatGPT, JavaScript, TypeScript, Python, React, Node.js, EPIC.LAN"
         )
         .part("file", part);
 

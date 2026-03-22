@@ -6,6 +6,10 @@
   box-sizing: border-box;
 }
 
+button, input, select, textarea {
+  font-family: inherit;
+}
+
 :root {
   --bg: #050505;
   --surface: #0e0e0e;
