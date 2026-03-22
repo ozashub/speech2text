@@ -7,6 +7,28 @@ import Settings from "./components/settings";
 
 const appWindow = getCurrentWindow();
 
+function HistoryItem({ item, latest }) {
+  const [copied, setCopied] = useState(false);
+  const words = item.text.split(/\s+/).filter(Boolean).length;
+  const chars = item.text.length;
+
+  const copy = async () => {
+    await invoke("paste_text", { text: item.text });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <div className={`history-item${latest ? " latest" : ""}`} onClick={copy}>
+      <p>{item.text}</p>
+      <div className="history-meta">
+        <span className="history-stats">{words} words, {chars} chars</span>
+        <span className="history-action">{copied ? "Pasted" : "Click to paste"}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -184,13 +206,15 @@ export default function App() {
           <span className={`status ${statusType}`}>{status}</span>
         </section>
 
-        {(transcript || history.length > 0) && (
+        {history.length > 0 && (
           <section className="history">
-            <h3>Transcripts</h3>
+            <div className="history-header">
+              <h3>Transcripts</h3>
+              <button className="clear-btn" onClick={() => { setHistory([]); setTranscript(""); }}>Clear</button>
+            </div>
             <div className="history-list">
-              {transcript && <div className="history-item latest"><p>{transcript}</p></div>}
-              {history.slice(1).map((h, i) => (
-                <div key={i} className="history-item"><p>{h.text}</p></div>
+              {history.map((h, i) => (
+                <HistoryItem key={h.time.getTime()} item={h} latest={i === 0} />
               ))}
             </div>
           </section>
