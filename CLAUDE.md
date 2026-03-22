@@ -46,8 +46,19 @@ TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/speech2text.key)" TAURI_SIGNING_PRIVAT
 3. Create `latest.json` with the new version, signature from `.exe.sig`, and download URL
 4. `gh release create vX.Y.Z` with the `.exe`, `.exe.sig`, and `latest.json`
 5. Users on old versions auto-update on next launch
+6. Update winget: `wingetcreate update ozas.speech2text -u <installer_url> -v <version> --submit`
 
 The signing key is at `~/.tauri/speech2text.key`. Never commit it.
+
+## Publishing to winget
+
+Package ID: `ozas.speech2text`. After each release:
+
+```
+wingetcreate update ozas.speech2text -u https://github.com/ozashub/speech2text/releases/download/vX.Y.Z/speech2text_X.Y.Z_x64-setup.exe -v X.Y.Z --submit
+```
+
+This auto-generates the manifest, computes the hash, and PRs it to microsoft/winget-pkgs. Requires `wingetcreate` (installed via `winget install Microsoft.WingetCreate`).
 
 ## Config
 
@@ -57,7 +68,7 @@ User config stored at `AppConfigDir/config.json` (Tauri resolves this per-platfo
 
 - Keyboard hook runs on its own thread with a Win32 message loop
 - Mic stream opens once at startup and stays alive (no getUserMedia delay per recording)
-- X button exits the process. Minimize hides to system tray.
+- X button hides to system tray. Minimize minimizes to taskbar. Quit from tray menu exits.
 - Default keybind is Ctrl+Shift (hold to record, release to transcribe+paste)
 - Mic button in the app toggles (click start, click stop)
 - Overlay window is transparent, always-on-top, ignores cursor events
