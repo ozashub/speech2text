@@ -93,6 +93,9 @@ struct Config {
     enhance: Option<bool>,
     enhance_prompt: Option<String>,
     word_fixes: Option<String>,
+    stats_words: Option<u64>,
+    stats_recordings: Option<u64>,
+    stats_seconds: Option<u64>,
 }
 
 fn config_path(app: &tauri::AppHandle) -> PathBuf {
@@ -201,6 +204,21 @@ fn load_word_fixes(app: tauri::AppHandle) -> Result<String, String> {
 }
 
 #[tauri::command]
+fn load_stats(app: tauri::AppHandle) -> Result<(u64, u64, u64), String> {
+    let c = read_config(&app);
+    Ok((c.stats_words.unwrap_or(0), c.stats_recordings.unwrap_or(0), c.stats_seconds.unwrap_or(0)))
+}
+
+#[tauri::command]
+fn bump_stats(app: tauri::AppHandle, words: u64, seconds: u64) -> Result<(), String> {
+    let mut c = read_config(&app);
+    c.stats_words = Some(c.stats_words.unwrap_or(0) + words);
+    c.stats_recordings = Some(c.stats_recordings.unwrap_or(0) + 1);
+    c.stats_seconds = Some(c.stats_seconds.unwrap_or(0) + seconds);
+    write_config(&app, &c)
+}
+
+#[tauri::command]
 fn set_hook_enabled(enabled: bool) -> Result<(), String> {
     if let Ok(mut g) = HOOK.lock() {
         if let Some(ref mut s) = *g {
@@ -267,7 +285,11 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
     let prompt = if word_fixes.trim().is_empty() {
         base_prompt
     } else {
-        format!("{}\n\nPREFERRED SPELLINGS (use these exact forms when the spoken word matches): {}", base_prompt, word_fixes)
+        format!(
+            "{}\n\nPREFERRED SPELLINGS (use these exact forms when the spoken word matches): {}",
+            base_prompt,
+            word_fixes
+        )
     };
 
     let body =
@@ -619,6 +641,8 @@ pub fn run() {
                 load_enhance_prompt,
                 save_word_fixes,
                 load_word_fixes,
+                load_stats,
+                bump_stats,
                 set_hook_enabled,
                 get_autostart,
                 set_autostart,

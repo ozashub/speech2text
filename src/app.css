@@ -365,6 +365,15 @@ main {
   color: var(--accent);
 }
 
+.stats-bar {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-3);
+  padding: 6px 0;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
 footer {
   height: 48px;
   display: flex;

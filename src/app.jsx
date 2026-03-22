@@ -46,6 +46,7 @@ export default function App() {
   const [micReady, setMicReady] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [stats, setStats] = useState([0, 0, 0]);
 
   const recRef = useRef(false);
   const procRef = useRef(false);
@@ -56,6 +57,7 @@ export default function App() {
   const ctxRef = useRef(null);
   const chunksRef = useRef([]);
   const sessionRef = useRef(0);
+  const recStartRef = useRef(0);
 
   useEffect(() => {
     recRef.current = recording;
@@ -123,6 +125,7 @@ export default function App() {
     rec.start(100);
     mediaRef.current = rec;
 
+    recStartRef.current = Date.now();
     setRecording(true);
     stat("Recording", "rec");
     invoke("show_overlay", { state: "recording" }).catch(() => {});
@@ -151,6 +154,9 @@ export default function App() {
       if (sid !== sessionRef.current) return;
       setTranscript(text);
       setHistory((h) => [{ text, time: new Date() }, ...h].slice(0, 20));
+      const secs = Math.round((Date.now() - recStartRef.current) / 1000);
+      const wc = text.split(/\s+/).filter(Boolean).length;
+      invoke("bump_stats", { words: wc, seconds: secs }).then(() => invoke("load_stats").then(setStats)).catch(() => {});
       stat("Pasting...", "done");
       await invoke("paste_text", { text });
       if (sid !== sessionRef.current) return;
@@ -183,6 +189,7 @@ export default function App() {
         if (k?.length) setKeybindLabel(k.join("+"));
       })
       .catch(() => {});
+    invoke("load_stats").then(setStats).catch(() => {});
 
     import("@tauri-apps/plugin-updater")
       .then(({ check }) => {
@@ -324,6 +331,12 @@ export default function App() {
           </section>
         )}
       </main>
+
+      {(stats[0] > 0 || stats[1] > 0) && (
+        <div className="stats-bar">
+          {stats[0].toLocaleString()} words · {Math.round(stats[2] / 60)} min recorded · {stats[1]} recordings
+        </div>
+      )}
 
       <footer>
         <kbd>hold {keybindLabel}</kbd>
