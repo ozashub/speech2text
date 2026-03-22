@@ -146,7 +146,7 @@ export default function Settings({ onClose, onSaved }) {
 
   return (
     <div className={`overlay ${closing ? "out" : ""}`} onClick={() => animateClose(onClose)}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className={`modal ${loaded ? "" : "no-transition"}`} onClick={(e) => e.stopPropagation()}>
         <h2>Settings</h2>
 
         <div className="field-group">

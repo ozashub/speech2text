@@ -562,6 +562,11 @@ kbd {
   transition: transform 0.2s, background 0.2s;
 }
 
+.no-transition .toggle,
+.no-transition .toggle-knob {
+  transition: none !important;
+}
+
 .toggle.on .toggle-knob {
   transform: translateX(18px);
   background: white;
