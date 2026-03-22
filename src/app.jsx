@@ -18,6 +18,7 @@ export default function App() {
   const [hasKey, setHasKey] = useState(false);
   const [keybindLabel, setKeybindLabel] = useState("Ctrl+Shift");
   const [micReady, setMicReady] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(null);
 
   const recRef = useRef(false);
   const procRef = useRef(false);
@@ -123,6 +124,11 @@ export default function App() {
       if (k?.length) setKeybindLabel(k.join("+"));
     }).catch(() => {});
 
+    import("@tauri-apps/plugin-updater").then(({ check }) => {
+      check().then((update) => {
+        if (update) setUpdateAvailable(update);
+      }).catch(() => {});
+    }).catch(() => {});
 
     const u1 = listen("start-recording", () => start());
     const u2 = listen("stop-recording", () => stop());
@@ -144,6 +150,20 @@ export default function App() {
       </header>
 
       <main>
+        {updateAvailable && (
+          <div className="update-banner">
+            <span>Update available</span>
+            <div className="update-banner-actions">
+              <button onClick={async () => {
+                const el = document.querySelector('.update-banner');
+                if (el) el.querySelector('span').textContent = 'Updating...';
+                await updateAvailable.downloadAndInstall();
+                invoke("exit_app");
+              }}>Install Now</button>
+              <button className="dismiss" onClick={() => setUpdateAvailable(null)}>Later</button>
+            </div>
+          </div>
+        )}
         <Visualizer analyserRef={analyserRef} recording={recording} processing={processing} />
 
         <section className="record-section">

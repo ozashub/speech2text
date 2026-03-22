@@ -29,7 +29,7 @@ body,
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   font-size: 13px;
   -webkit-font-smoothing: antialiased;
   user-select: none;
@@ -496,7 +496,7 @@ kbd {
   border-radius: 8px;
   color: var(--text);
   font-size: 13px;
-  font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+  font-family: inherit;
   cursor: pointer;
   text-align: left;
   transition: box-shadow 0.2s;
@@ -628,4 +628,52 @@ kbd {
   background: var(--accent);
   border-radius: 2px;
   transition: width 0.15s;
+}
+
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-radius: 8px;
+  margin-top: 12px;
+  animation: fade-in 0.2s ease-out;
+}
+
+.update-banner span {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.update-banner-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.update-banner button {
+  font-size: 11px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  background: var(--accent);
+  color: white;
+  transition: background 0.15s;
+}
+
+.update-banner button:hover { background: var(--accent-hover); }
+.update-banner button:active { transform: scale(0.97); }
+
+.update-banner button.dismiss {
+  background: var(--surface-2);
+  color: var(--text-3);
+}
+
+.update-banner button.dismiss:hover {
+  background: #222;
+  color: var(--text-2);
 }
