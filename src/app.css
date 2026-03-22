@@ -102,6 +102,7 @@ body,
   color: var(--text-2);
 }
 
+.win-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .win-close:hover {
   background: var(--danger);
   color: white;
@@ -163,10 +164,12 @@ main {
   animation: glow-pulse 1.6s ease-in-out infinite;
 }
 
+.rec-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .rec-btn.busy {
   color: var(--accent);
   background: var(--surface);
   pointer-events: none;
+  cursor: not-allowed;
   animation: spin-glow 1.5s linear infinite;
 }
 
@@ -187,7 +190,7 @@ main {
   font-size: 12px;
   color: var(--text-3);
   letter-spacing: 0.2px;
-  transition: color 0.2s;
+  transition: color 0.3s ease-out;
 }
 
 .status.rec { color: var(--danger); }
@@ -221,6 +224,8 @@ main {
 
 .history-list::-webkit-scrollbar { width: 3px; }
 .history-list::-webkit-scrollbar-thumb { background: var(--text-3); border-radius: 2px; }
+.history-list::-webkit-scrollbar-track { background: transparent; }
+.history-list { scrollbar-color: var(--text-3) transparent; }
 
 .history-item {
   padding: 10px 14px;
@@ -240,6 +245,8 @@ main {
   word-break: break-word;
 }
 
+.history-item:not(.latest) { cursor: pointer; }
+.history-item:not(.latest):hover { background: var(--surface-2); }
 .history-item:not(.latest) p {
   color: var(--text-2);
 }
@@ -282,6 +289,8 @@ kbd {
   background: var(--surface);
   color: var(--text-2);
 }
+.gear-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gear-btn:active { transform: scale(0.92); }
 
 .overlay {
   position: fixed;
@@ -292,6 +301,7 @@ kbd {
   justify-content: center;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(12px);
+  cursor: pointer;
   animation: fade-in 0.15s ease-out;
 }
 
@@ -316,6 +326,7 @@ kbd {
   border-radius: 16px;
   padding: 28px;
   width: 320px;
+  cursor: default;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -392,9 +403,8 @@ kbd {
   transition: color 0.15s;
 }
 
-.toggle-vis:hover {
-  color: var(--text-2);
-}
+.toggle-vis:hover { color: var(--text-2); }
+.toggle-vis:active { transform: translateY(-50%) scale(0.9); }
 
 .key-hint {
   font-size: 11px;
@@ -478,6 +488,7 @@ kbd {
   background: #222;
   color: var(--text);
 }
+.btn-cancel:active { transform: scale(0.97); }
 
 .keybind-btn {
   width: 100%;
@@ -496,6 +507,7 @@ kbd {
 .keybind-btn:hover {
   box-shadow: 0 0 0 2px rgba(124, 92, 252, 0.3);
 }
+.keybind-btn:focus-visible { box-shadow: 0 0 0 2px var(--accent); outline: none; }
 
 .keybind-btn.active {
   box-shadow: 0 0 0 2px var(--accent);
@@ -518,13 +530,16 @@ kbd {
   width: 40px;
   height: 22px;
   border-radius: 11px;
-  background: var(--bg);
+  background: var(--surface-2);
   border: none;
   cursor: pointer;
   position: relative;
   transition: background 0.2s;
   flex-shrink: 0;
 }
+.toggle:hover { box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.2); }
+.toggle:focus-visible { box-shadow: 0 0 0 2px var(--accent); outline: none; }
+.toggle:active { transform: scale(0.96); }
 
 .toggle.on {
   background: var(--accent);
@@ -573,6 +588,8 @@ kbd {
   background: var(--surface-2);
   color: var(--text);
 }
+.update-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.update-btn:active { transform: scale(0.97); }
 
 .update-btn.accent {
   background: var(--accent);
