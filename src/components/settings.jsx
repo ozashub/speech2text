@@ -79,6 +79,10 @@ export default function Settings({ onClose, onSaved }) {
   const [loaded, setLoaded] = useState(false);
   const [shareStatus, setShareStatus] = useState("");
   const [savedKey, setSavedKey] = useState("");
+  const [promptOpen, setPromptOpen] = useState(false);
+  const [promptClosing, setPromptClosing] = useState(false);
+  const [promptText, setPromptText] = useState("");
+  const [promptSaved, setPromptSaved] = useState("");
   const updateRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -94,6 +98,7 @@ export default function Settings({ onClose, onSaved }) {
       invoke("load_keybind").then((k) => { if (k?.length) setKeybind(k); }).catch(() => {}),
       invoke("get_autostart").then(setAutostart).catch(() => {}),
       invoke("load_enhance").then(setEnhance).catch(() => {}),
+      invoke("load_enhance_prompt").then((p) => { setPromptText(p); setPromptSaved(p); }).catch(() => {}),
       getVersion().then(setVersion).catch(() => {}),
     ]).then(() => {
       setLoaded(true);
@@ -191,6 +196,31 @@ export default function Settings({ onClose, onSaved }) {
     }
   };
 
+  const openPrompt = () => {
+    setPromptText(promptSaved);
+    setPromptOpen(true);
+    setPromptClosing(false);
+  };
+
+  const closePrompt = () => {
+    setPromptClosing(true);
+    setTimeout(() => { setPromptOpen(false); setPromptClosing(false); setPromptText(promptSaved); }, 200);
+  };
+
+  const savePrompt = async () => {
+    await invoke("save_enhance_prompt", { prompt: promptText }).catch(() => {});
+    setPromptSaved(promptText);
+    setPromptClosing(true);
+    setTimeout(() => { setPromptOpen(false); setPromptClosing(false); }, 200);
+  };
+
+  const resetPrompt = async () => {
+    await invoke("save_enhance_prompt", { prompt: "" });
+    const p = await invoke("load_enhance_prompt");
+    setPromptText(p);
+    setPromptSaved(p);
+  };
+
   return (
     <div className={`overlay ${closing ? "out" : ""}`} onClick={() => animateClose(onClose)}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -258,6 +288,7 @@ export default function Settings({ onClose, onSaved }) {
             <div>
               <label>Enhance</label>
               <span className="field-hint">Cleans up filler words and structures text</span>
+              {enhance && <button className="edit-prompt-btn" type="button" onClick={openPrompt}>Edit prompt</button>}
             </div>
             <button className={`toggle ${enhance ? "on" : ""}`} onClick={() => setEnhance(!enhance)} type="button">
               <span className="toggle-knob" />
@@ -291,6 +322,27 @@ export default function Settings({ onClose, onSaved }) {
         </div>
         </>}
       </div>
+
+      {promptOpen && (
+        <div className={`prompt-overlay ${promptClosing ? "out" : ""}`} onClick={closePrompt}>
+          <div className="prompt-editor" onClick={(e) => e.stopPropagation()}>
+            <div className="prompt-header">
+              <h3>Enhance Prompt</h3>
+              <button className="prompt-reset" type="button" onClick={resetPrompt}>Reset to default</button>
+            </div>
+            <textarea
+              value={promptText}
+              onChange={(e) => setPromptText(e.target.value)}
+              spellCheck={false}
+              placeholder="Enter your custom enhance prompt..."
+            />
+            <div className="prompt-actions">
+              <button className="btn-save" onClick={savePrompt}>Save</button>
+              <button className="btn-cancel" onClick={closePrompt}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

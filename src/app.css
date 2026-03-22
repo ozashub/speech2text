@@ -776,3 +776,106 @@ kbd {
   background: #222;
   color: var(--text-2);
 }
+
+.edit-prompt-btn {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.edit-prompt-btn:hover { opacity: 1; }
+
+.prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  animation: fade-in 0.15s ease-out;
+}
+
+.prompt-overlay.out {
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
+.prompt-overlay.out .prompt-editor {
+  transform: translateY(8px) scale(0.97);
+  opacity: 0;
+  transition: transform 0.2s ease-in, opacity 0.2s ease-in;
+}
+
+.prompt-editor {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 20px;
+  width: 380px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: modal-up 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prompt-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.prompt-reset {
+  font-size: 11px;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.prompt-reset:hover { color: var(--accent); }
+
+.prompt-editor textarea {
+  width: 100%;
+  min-height: 240px;
+  max-height: 50vh;
+  padding: 12px;
+  background: var(--bg);
+  border: none;
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+
+.prompt-editor textarea:focus {
+  box-shadow: 0 0 0 2px rgba(124, 92, 252, 0.4);
+}
+
+.prompt-editor textarea::placeholder {
+  color: var(--text-3);
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 8px;
+}
