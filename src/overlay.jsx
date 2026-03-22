@@ -42,7 +42,7 @@ function Overlay() {
           <polyline points="20 6 9 17 4 12" />
         </svg>
       )}
-      <span>{state === "transcribing" ? "transcribing..." : state}</span>
+      <span>{state === "recording" ? "Recording" : state === "transcribing" ? "Transcribing..." : state === "done" ? "Done" : state}</span>
     </div>
   );
 }

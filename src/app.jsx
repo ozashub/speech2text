@@ -10,7 +10,7 @@ const appWindow = getCurrentWindow();
 export default function App() {
   const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [status, setStatus] = useState("ready");
+  const [status, setStatus] = useState("Ready");
   const [statusType, setStatusType] = useState("");
   const [transcript, setTranscript] = useState("");
   const [history, setHistory] = useState([]);
@@ -53,7 +53,7 @@ export default function App() {
       analyserRef.current = analyser;
       setMicReady(true);
     }).catch(() => {
-      stat("mic denied", "err");
+      stat("Mic denied", "err");
     });
   }, []);
 
@@ -72,7 +72,7 @@ export default function App() {
     mediaRef.current = rec;
 
     setRecording(true);
-    stat("recording", "rec");
+    stat("Recording", "rec");
     invoke("show_overlay", { state: "recording" }).catch(() => {});
   }, []);
 
@@ -85,7 +85,7 @@ export default function App() {
   const done = async () => {
     const sid = sessionRef.current;
     setProcessing(true);
-    stat("transcribing...", "");
+    stat("Transcribing...", "");
     invoke("show_overlay", { state: "transcribing" }).catch(() => {});
 
     const blob = new Blob(chunksRef.current, { type: "audio/webm" });
@@ -98,17 +98,17 @@ export default function App() {
       if (sid !== sessionRef.current) return;
       setTranscript(text);
       setHistory((h) => [{ text, time: new Date() }, ...h].slice(0, 20));
-      stat("pasting...", "done");
+      stat("Pasting...", "done");
       await invoke("paste_text", { text });
       if (sid !== sessionRef.current) return;
       invoke("show_overlay", { state: "done" }).catch(() => {});
-      stat("done", "done");
-      setTimeout(() => { if (sid === sessionRef.current && !recRef.current) stat("ready", ""); }, 2000);
+      stat("Done", "done");
+      setTimeout(() => { if (sid === sessionRef.current && !recRef.current) stat("Ready", ""); }, 2000);
     } catch (e) {
       if (sid !== sessionRef.current) return;
       stat(String(e), "err");
       invoke("hide_overlay").catch(() => {});
-      setTimeout(() => { if (sid === sessionRef.current && !recRef.current) stat("ready", ""); }, 5000);
+      setTimeout(() => { if (sid === sessionRef.current && !recRef.current) stat("Ready", ""); }, 5000);
     }
 
     setProcessing(false);
@@ -132,7 +132,7 @@ export default function App() {
   return (
     <>
       <header className="titlebar" data-tauri-drag-region>
-        <span className="app-name" data-tauri-drag-region>speech2text</span>
+        <span className="app-name" data-tauri-drag-region>Speech2Text</span>
         <div className="win-controls">
           <button className="win-btn" onClick={() => appWindow.hide()}>
             <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
@@ -164,7 +164,7 @@ export default function App() {
 
         {(transcript || history.length > 0) && (
           <section className="history">
-            <h3>transcripts</h3>
+            <h3>Transcripts</h3>
             <div className="history-list">
               {transcript && <div className="history-item latest"><p>{transcript}</p></div>}
               {history.slice(1).map((h, i) => (
@@ -190,7 +190,7 @@ export default function App() {
           onSaved={() => {
             setHasKey(true);
             setShowSettings(false);
-            stat("ready", "");
+            stat("Ready", "");
             invoke("load_keybind").then((k) => { if (k?.length) setKeybindLabel(k.join("+")); }).catch(() => {});
           }}
         />
