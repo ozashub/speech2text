@@ -4211,7 +4211,7 @@ dependencies = [
 
 [[package]]
 name = "speech2text"
-version = "0.1.8"
+version = "0.1.9"
 dependencies = [
  "arboard",
  "base64 0.22.1",

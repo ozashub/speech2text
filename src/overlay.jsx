@@ -7,14 +7,30 @@ import "./overlay.css";
 function Overlay() {
   const [state, setState] = useState(null);
   const [hiding, setHiding] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
   const timersRef = useRef([]);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const unlisten = listen("overlay-state", (e) => {
       timersRef.current.forEach(clearTimeout);
       timersRef.current = [];
+      if (intervalRef.current) clearInterval(intervalRef.current);
       setHiding(false);
       setState(e.payload);
+
+      if (e.payload === "recording") {
+        setElapsed(0);
+        const start = Date.now();
+        intervalRef.current = setInterval(() => {
+          setElapsed(Math.floor((Date.now() - start) / 1000));
+        }, 200);
+      }
+
+      if (e.payload !== "recording" && intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
 
       if (e.payload === "done") {
         const t1 = setTimeout(() => {
@@ -30,10 +46,13 @@ function Overlay() {
     });
     return () => {
       unlisten.then((f) => f());
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
   if (!state) return null;
+
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
     <div className={`pill ${state} ${hiding ? "out" : ""}`}>
@@ -55,7 +74,7 @@ function Overlay() {
       )}
       <span>
         {state === "recording"
-          ? "Recording"
+          ? `Recording ${fmt(elapsed)}`
           : state === "transcribing"
             ? "Transcribing..."
             : state === "done"
