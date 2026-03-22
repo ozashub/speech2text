@@ -83,6 +83,10 @@ export default function Settings({ onClose, onSaved }) {
   const [promptClosing, setPromptClosing] = useState(false);
   const [promptText, setPromptText] = useState("");
   const [promptSaved, setPromptSaved] = useState("");
+  const [wordFixesOpen, setWordFixesOpen] = useState(false);
+  const [wordFixesClosing, setWordFixesClosing] = useState(false);
+  const [wordFixesText, setWordFixesText] = useState("");
+  const [wordFixesSaved, setWordFixesSaved] = useState("");
   const updateRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -99,6 +103,7 @@ export default function Settings({ onClose, onSaved }) {
       invoke("get_autostart").then(setAutostart).catch(() => {}),
       invoke("load_enhance").then(setEnhance).catch(() => {}),
       invoke("load_enhance_prompt").then((p) => { setPromptText(p); setPromptSaved(p); }).catch(() => {}),
+      invoke("load_word_fixes").then((w) => { setWordFixesText(w); setWordFixesSaved(w); }).catch(() => {}),
       getVersion().then(setVersion).catch(() => {}),
     ]).then(() => {
       setLoaded(true);
@@ -146,6 +151,7 @@ export default function Settings({ onClose, onSaved }) {
       await invoke("save_language", { language: lang });
       await invoke("save_keybind", { keys: keybind });
       await invoke("save_enhance", { enabled: enhance });
+      await invoke("save_word_fixes", { words: wordFixesText });
       await invoke("set_autostart", { enabled: autostart });
       onSaved();
       animateClose(onClose);
@@ -221,6 +227,25 @@ export default function Settings({ onClose, onSaved }) {
     setPromptSaved(p);
   };
 
+  const closeWordFixes = () => {
+    setWordFixesClosing(true);
+    setTimeout(() => { setWordFixesOpen(false); setWordFixesClosing(false); setWordFixesText(wordFixesSaved); }, 200);
+  };
+
+  const saveWordFixes = async () => {
+    await invoke("save_word_fixes", { words: wordFixesText }).catch(() => {});
+    setWordFixesSaved(wordFixesText);
+    setWordFixesClosing(true);
+    setTimeout(() => { setWordFixesOpen(false); setWordFixesClosing(false); }, 200);
+  };
+
+  const resetWordFixes = async () => {
+    await invoke("save_word_fixes", { words: "" });
+    const w = await invoke("load_word_fixes");
+    setWordFixesText(w);
+    setWordFixesSaved(w);
+  };
+
   return (
     <div className={`overlay ${closing ? "out" : ""}`} onClick={() => animateClose(onClose)}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -294,6 +319,12 @@ export default function Settings({ onClose, onSaved }) {
               <span className="toggle-knob" />
             </button>
           </div>
+
+          <div className="field-group">
+            <label>Word Fixes</label>
+            <span className="field-hint">Words Whisper often misspells. Comma-separated.</span>
+            <button className="edit-prompt-btn" type="button" onClick={() => setWordFixesOpen(true)}>Edit words</button>
+          </div>
         </div>
 
         <div className="modal-actions">
@@ -339,6 +370,29 @@ export default function Settings({ onClose, onSaved }) {
             <div className="prompt-actions">
               <button className="btn-save" onClick={savePrompt}>Save</button>
               <button className="btn-cancel" onClick={closePrompt}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {wordFixesOpen && (
+        <div className={`prompt-overlay ${wordFixesClosing ? "out" : ""}`} onClick={closeWordFixes}>
+          <div className="prompt-editor" onClick={(e) => e.stopPropagation()}>
+            <div className="prompt-header">
+              <h3>Word Fixes</h3>
+              <button className="prompt-reset" type="button" onClick={resetWordFixes}>Reset to default</button>
+            </div>
+            <textarea
+              value={wordFixesText}
+              onChange={(e) => setWordFixesText(e.target.value)}
+              spellCheck={false}
+              placeholder="Groq, GitHub, TypeScript, ..."
+              rows={4}
+            />
+            <span className="field-hint" style={{marginTop: 4}}>Comma-separated. Whisper will prefer these exact spellings.</span>
+            <div className="prompt-actions">
+              <button className="btn-save" onClick={saveWordFixes}>Save</button>
+              <button className="btn-cancel" onClick={closeWordFixes}>Cancel</button>
             </div>
           </div>
         </div>

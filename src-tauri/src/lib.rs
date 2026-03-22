@@ -92,6 +92,7 @@ struct Config {
     keybind: Option<Vec<String>>,
     enhance: Option<bool>,
     enhance_prompt: Option<String>,
+    word_fixes: Option<String>,
 }
 
 fn config_path(app: &tauri::AppHandle) -> PathBuf {
@@ -184,6 +185,21 @@ fn load_enhance_prompt(app: tauri::AppHandle) -> Result<String, String> {
     Ok(read_config(&app).enhance_prompt.unwrap_or_else(|| DEFAULT_ENHANCE_PROMPT.to_string()))
 }
 
+const DEFAULT_WORD_FIXES: &str =
+    "Groq, GitHub, Tauri, Cloudflare, Discord, Claude, ChatGPT, JavaScript, TypeScript, Python, React, Node.js";
+
+#[tauri::command]
+fn save_word_fixes(app: tauri::AppHandle, words: String) -> Result<(), String> {
+    let mut c = read_config(&app);
+    c.word_fixes = if words.trim().is_empty() { None } else { Some(words) };
+    write_config(&app, &c)
+}
+
+#[tauri::command]
+fn load_word_fixes(app: tauri::AppHandle) -> Result<String, String> {
+    Ok(read_config(&app).word_fixes.unwrap_or_else(|| DEFAULT_WORD_FIXES.to_string()))
+}
+
 #[tauri::command]
 fn set_hook_enabled(enabled: bool) -> Result<(), String> {
     if let Ok(mut g) = HOOK.lock() {
@@ -209,13 +225,12 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
         .mime_str("audio/webm")
         .map_err(|e| e.to_string())?;
 
+    let word_fixes = cfg.word_fixes.unwrap_or_else(|| DEFAULT_WORD_FIXES.to_string());
+
     let mut form = multipart::Form
         ::new()
         .text("model", "whisper-large-v3")
-        .text(
-            "prompt",
-            "Groq, GitHub, Tauri, Cloudflare, Discord, Claude, ChatGPT, JavaScript, TypeScript, Python, React, Node.js, EPIC.LAN"
-        )
+        .text("prompt", word_fixes.clone())
         .part("file", part);
 
     if let Some(ref lang) = cfg.language {
@@ -248,7 +263,12 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
     }
 
     let estimated_tokens = (text.len() / 4).max(32) + 16;
-    let prompt = cfg.enhance_prompt.unwrap_or_else(|| DEFAULT_ENHANCE_PROMPT.to_string());
+    let base_prompt = cfg.enhance_prompt.unwrap_or_else(|| DEFAULT_ENHANCE_PROMPT.to_string());
+    let prompt = if word_fixes.trim().is_empty() {
+        base_prompt
+    } else {
+        format!("{}\n\nPREFERRED SPELLINGS (use these exact forms when the spoken word matches): {}", base_prompt, word_fixes)
+    };
 
     let body =
         serde_json::json!({
@@ -589,6 +609,8 @@ pub fn run() {
                 load_enhance,
                 save_enhance_prompt,
                 load_enhance_prompt,
+                save_word_fixes,
+                load_word_fixes,
                 set_hook_enabled,
                 get_autostart,
                 set_autostart,
