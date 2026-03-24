@@ -13,7 +13,7 @@ function HistoryItem({ item, latest }) {
   const chars = item.text.length;
 
   const copy = async () => {
-    await invoke("paste_text", { text: item.text });
+    await navigator.clipboard.writeText(item.text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
@@ -26,7 +26,7 @@ function HistoryItem({ item, latest }) {
           {words} words, {chars} chars
         </span>
         <span className="history-action">
-          {copied ? "Pasted" : "Click to paste"}
+          {copied ? "Copied" : "Click to copy"}
         </span>
       </div>
     </div>
