@@ -539,7 +539,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
-            tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None)
+            tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec!["--minimized".into()]))
         )
         .plugin(tauri_plugin_deep_link::init())
         .on_window_event(|window, event| {
@@ -607,9 +607,8 @@ pub fn run() {
             let _ = overlay.set_ignore_cursor_events(true);
 
             {
-                use tauri_plugin_autostart::ManagerExt;
-                let silent = app.autolaunch().is_enabled().unwrap_or(false);
-                if !silent {
+                let launched_minimized = std::env::args().any(|a| a == "--minimized");
+                if !launched_minimized {
                     if let Some(w) = app.get_webview_window("main") {
                         let _ = w.show();
                         let _ = w.set_focus();
