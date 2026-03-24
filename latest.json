@@ -1,0 +1,11 @@
+{
+  "version": "1.0.1",
+  "notes": "Fix window not showing on startup when autostart is enabled",
+  "pub_date": "2026-03-24T00:00:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUldTU1FrTUtlcFpEamtpVjczbGYwaHRiaUVqSG42eDdOUmc2YzFvNGQ1ekNpN3BGbmp3ZndBVXd1U0pYRWpLQUU3TFc5NDJZdVE1UEtnOTdiK2VCUE12NXNVZkswYUx6QncwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0MzY2Mzg5CWZpbGU6c3BlZWNoMnRleHRfMS4wLjFfeDY0LXNldHVwLmV4ZQo4czAzQ3Z2QXNTaGovbWUyT3djTi9FSG9kWVo2TVdzd2wyd1RLOUwvUEVoSk1kbFp6a3NUaVVDQkZFdk5KZDJJUHoreTZiWmlTbXdpYUh0OFUyZTZEQT09Cg==",
+      "url": "https://github.com/ozashub/speech2text/releases/download/v1.0.1/speech2text_1.0.1_x64-setup.exe"
+    }
+  }
+}
