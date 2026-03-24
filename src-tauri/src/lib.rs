@@ -330,20 +330,12 @@ async fn transcribe(app: tauri::AppHandle, audio_base64: String) -> Result<Strin
 #[tauri::command]
 fn paste_text(text: String) -> Result<(), String> {
     let mut cb = Clipboard::new().map_err(|e| e.to_string())?;
-    let prev = cb.get_text().ok();
-
     cb.set_text(&text).map_err(|e| e.to_string())?;
     thread::sleep(Duration::from_millis(80));
     let mut kbd = Enigo::new(&Settings::default()).map_err(|e| e.to_string())?;
     kbd.key(Key::Control, Direction::Press).map_err(|e| e.to_string())?;
     kbd.key(Key::Unicode('v'), Direction::Click).map_err(|e| e.to_string())?;
     kbd.key(Key::Control, Direction::Release).map_err(|e| e.to_string())?;
-
-    if let Some(old) = prev {
-        thread::sleep(Duration::from_millis(120));
-        cb.set_text(&old).ok();
-    }
-
     Ok(())
 }
 
@@ -452,11 +444,12 @@ unsafe extern "system" fn kb_proc(
     if code >= 0 {
         let kb = &*(lparam as *const win::KBDLLHOOKSTRUCT);
         let vk = norm_vk(kb.vkCode);
+        let msg = wparam as u32;
 
         if let Ok(mut g) = HOOK.try_lock() {
             if let Some(ref mut s) = *g {
-                if s.enabled && s.keys.contains(&vk) {
-                    let msg = wparam as u32;
+                if !s.enabled {
+                } else if s.keys.contains(&vk) {
                     if msg == win::WM_KEYDOWN || msg == win::WM_SYSKEYDOWN {
                         s.pressed.insert(vk);
                         if !s.active && s.keys.iter().all(|k| s.pressed.contains(k)) {
@@ -475,6 +468,11 @@ unsafe extern "system" fn kb_proc(
                             let _ = s.app.emit("stop-recording", ());
                         }
                     }
+                } else if s.active && (msg == win::WM_KEYDOWN || msg == win::WM_SYSKEYDOWN) {
+                    s.active = false;
+                    s.pressed.clear();
+                    let _ = s.app.emit("cancel-recording", ());
+                    let _ = s.app.emit("overlay-state", "cancelled");
                 }
             }
         }

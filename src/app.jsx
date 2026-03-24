@@ -137,6 +137,20 @@ export default function App() {
     setRecording(false);
   }, []);
 
+  const cancel = useCallback(() => {
+    if (!recRef.current || !mediaRef.current) return;
+    mediaRef.current.ondataavailable = null;
+    mediaRef.current.onstop = null;
+    mediaRef.current.stop();
+    chunksRef.current = [];
+    setRecording(false);
+    setProcessing(false);
+    stat("Cancelled", "");
+    setTimeout(() => {
+      if (!recRef.current) stat("Ready", "");
+    }, 1500);
+  }, []);
+
   const done = async () => {
     const sid = sessionRef.current;
     setProcessing(true);
@@ -208,12 +222,14 @@ export default function App() {
       stat("Key imported", "done");
       setTimeout(() => stat("Ready", ""), 2000);
     });
+    const u4 = listen("cancel-recording", () => cancel());
     return () => {
       u1.then((f) => f());
       u2.then((f) => f());
       u3.then((f) => f());
+      u4.then((f) => f());
     };
-  }, [start, stop]);
+  }, [start, stop, cancel]);
 
   return (
     <div className="shell">

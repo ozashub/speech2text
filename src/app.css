@@ -31,6 +31,7 @@ body,
 #root {
   height: 100%;
   overflow: hidden;
+  background: #050505;
 }
 
 .shell {
@@ -152,8 +153,8 @@ main {
 
 .visualizer {
   width: 100%;
-  height: 72px;
-  margin-top: 20px;
+  height: 60px;
+  margin-top: 16px;
   flex-shrink: 0;
 }
 
@@ -162,14 +163,14 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  padding: 32px 0 24px;
+  gap: 12px;
+  padding: 20px 0 16px;
   flex-shrink: 0;
 }
 
 .rec-btn {
-  width: 80px;
-  height: 80px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   border: none;
   background: var(--surface-2);
@@ -469,7 +470,7 @@ kbd {
 .modal {
   background: var(--surface);
   border-radius: 14px;
-  padding: 24px;
+  padding: 20px;
   width: 340px;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
@@ -480,6 +481,21 @@ kbd {
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
   animation: modal-up 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+}
+
+.modal::-webkit-scrollbar {
+  width: 4px;
+}
+.modal::-webkit-scrollbar-thumb {
+  background: var(--text-3);
+  border-radius: 2px;
+}
+.modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal {
+  scrollbar-color: var(--text-3) transparent;
+  scrollbar-width: thin;
 }
 
 @keyframes modal-up {
@@ -494,19 +510,19 @@ kbd {
 }
 
 .modal h2 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
   letter-spacing: -0.3px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .settings-section {
-  padding: 14px 0;
+  padding: 12px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .settings-section:first-of-type {
@@ -534,7 +550,7 @@ kbd {
 
 .input-row input {
   width: 100%;
-  padding: 11px 40px 11px 14px;
+  padding: 9px 40px 9px 12px;
   background: var(--bg);
   border: none;
   border-radius: 8px;
@@ -621,7 +637,7 @@ kbd {
 
 .field-group select {
   width: 100%;
-  padding: 11px 14px;
+  padding: 9px 12px;
   background: var(--bg);
   border: none;
   border-radius: 8px;
@@ -649,7 +665,7 @@ kbd {
 .modal-actions {
   display: flex;
   gap: 8px;
-  padding-top: 20px;
+  padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   margin-top: 4px;
 }
@@ -695,7 +711,7 @@ kbd {
 
 .keybind-btn {
   width: 100%;
-  padding: 11px 14px;
+  padding: 9px 12px;
   background: var(--bg);
   border: none;
   border-radius: 8px;
@@ -795,9 +811,9 @@ kbd {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 14px;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
 }
 
 .version-label {
@@ -934,6 +950,7 @@ kbd {
 
 .edit-prompt-btn {
   display: inline-block;
+  align-self: flex-start;
   margin-top: 2px;
   font-size: 11px;
   color: var(--accent);
@@ -941,6 +958,7 @@ kbd {
   border: none;
   cursor: pointer;
   padding: 0;
+  text-align: left;
   opacity: 0.8;
   transition: opacity 0.15s;
 }

@@ -102,3 +102,6 @@ body,
 .pill.done {
   color: #7be08a;
 }
+.pill.cancelled {
+  color: #ff6b6b;
+}
