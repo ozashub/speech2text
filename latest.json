@@ -1,11 +1,11 @@
 {
-  "version": "1.1.1",
-  "notes": "Fix keybind re-trigger during transcription, history copies to clipboard",
+  "version": "1.1.2",
+  "notes": "Keybind overrides transcription, fix updater deadlock",
   "pub_date": "2026-03-25T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUldTU1FrTUtlcFpEampQRVpwNEpGenpuVzZHZU53L2Z6dUZnUDRtcXB4elloS01mM3RGZ2VyWlk0b0xwakZ6cStVY0VKOXEzSUhtalphbkE2Ui9lcUxBR3RwNkI5SlFMbEFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NDA2MDExCWZpbGU6c3BlZWNoMnRleHRfMS4xLjFfeDY0LXNldHVwLmV4ZQpJSldVSUY3VU1xdm5DNUVGTmQwUkh3QUtLMHorcVBhRzlTb2ppaS8zbzBaT1FlZmo5ek9lcjJ0NytTT0tBWmlvRWg0ZENWdmpVbm8zaW82bFJ1aVdCZz09Cg==",
-      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.1/speech2text_1.1.1_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTU1FrTUtlcFpEamdCMXFmZ0dMRWpBSHZBZXdmeDFUQW1zcC8rU2tyTVp5MzhiVlM4c1IvMG1QZjh1QWdxTUdldjhQMDE1T2FFRFFUODFvai9Zckx0QisxS21QOE16amdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NDA2NDY2CWZpbGU6c3BlZWNoMnRleHRfMS4xLjJfeDY0LXNldHVwLmV4ZQo5ZUoxMHVVTnV6aVlEQ2FsVGh3YzlSdWEyd0dvMW5acnVobGZ3YWxNOHpVZlAyVThjNjl5MG54OFBwbVd6N2g4UE5uY2U4bjdJUmVnUWpIYXBsb3lDZz09Cg==",
+      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.2/speech2text_1.1.2_x64-setup.exe"
     }
   }
 }
