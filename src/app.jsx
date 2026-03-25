@@ -105,14 +105,15 @@ export default function App() {
   }, []);
 
   const start = useCallback(() => {
-    if (recRef.current || procRef.current || !streamRef.current) return;
+    if (recRef.current || !streamRef.current) return;
     if (!keyRef.current) {
       setShowSettings(true);
       return;
     }
 
-    chunksRef.current = [];
     sessionRef.current++;
+    setProcessing(false);
+    chunksRef.current = [];
     const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
       ? "audio/webm;codecs=opus"
       : "audio/webm";
@@ -267,8 +268,13 @@ export default function App() {
               <button
                 onClick={async () => {
                   setUpdating(true);
-                  await updateAvailable.downloadAndInstall();
-                  invoke("exit_app");
+                  try {
+                    await updateAvailable.downloadAndInstall((e) => {
+                      if (e.event === "Finished") {
+                        setTimeout(() => invoke("exit_app").catch(() => {}), 500);
+                      }
+                    });
+                  } catch {}
                 }}
               >
                 Install Now
