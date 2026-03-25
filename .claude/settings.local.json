@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr:*)",
+      "Bash(wingetcreate submit:*)",
+      "Bash(wingetcreate new:*)",
+      "Bash(wingetcreate update:*)"
+    ]
+  }
+}

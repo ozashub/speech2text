@@ -454,12 +454,7 @@ unsafe extern "system" fn kb_proc(
                         s.pressed.insert(vk);
                         if !s.active && s.keys.iter().all(|k| s.pressed.contains(k)) {
                             s.active = true;
-                            position_overlay_on_active_monitor(&s.app);
                             let _ = s.app.emit("start-recording", ());
-                            if let Some(w) = s.app.get_webview_window("overlay") {
-                                let _ = w.show();
-                            }
-                            let _ = s.app.emit("overlay-state", "recording");
                         }
                     } else if msg == win::WM_KEYUP || msg == win::WM_SYSKEYUP {
                         s.pressed.remove(&vk);

@@ -105,7 +105,7 @@ export default function App() {
   }, []);
 
   const start = useCallback(() => {
-    if (recRef.current || !streamRef.current) return;
+    if (recRef.current || procRef.current || !streamRef.current) return;
     if (!keyRef.current) {
       setShowSettings(true);
       return;
@@ -113,7 +113,6 @@ export default function App() {
 
     chunksRef.current = [];
     sessionRef.current++;
-    setProcessing(false);
     const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
       ? "audio/webm;codecs=opus"
       : "audio/webm";
@@ -146,7 +145,9 @@ export default function App() {
     setRecording(false);
     setProcessing(false);
     stat("Cancelled", "");
+    invoke("show_overlay", { state: "cancelled" }).catch(() => {});
     setTimeout(() => {
+      invoke("hide_overlay").catch(() => {});
       if (!recRef.current) stat("Ready", "");
     }, 1500);
   }, []);
