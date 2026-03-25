@@ -1,11 +1,11 @@
 {
-  "version": "1.1.0",
-  "notes": "UI polish, cancel recording, clipboard preserved",
-  "pub_date": "2026-03-24T00:00:00Z",
+  "version": "1.1.1",
+  "notes": "Fix keybind re-trigger during transcription, history copies to clipboard",
+  "pub_date": "2026-03-25T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUldTU1FrTUtlcFpEam00d2xIOFhLbFFWU094TjNFTTZ1Z0lreUl5S05CdFpnVEhybkRIQnYxcVNGbEFSODZxQjJXMzNsbGtNN0tiYTRnc1FmT1BzUzNwUlVHbWtJZTA4dlF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0Mzc2MDQ3CWZpbGU6c3BlZWNoMnRleHRfMS4xLjBfeDY0LXNldHVwLmV4ZQprTnd2YWJMaDVKeHhGcExiVHRVVDljbHRqWDN0Qk5EMmVRNGV6Zzh0Wmx3WHlYL2tTOGhhMmF1L21UK0pJeTVGRlJiMlMrL01qemoyRjVMOVUzOUZBZz09Cg==",
-      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.0/speech2text_1.1.0_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUldTU1FrTUtlcFpEampQRVpwNEpGenpuVzZHZU53L2Z6dUZnUDRtcXB4elloS01mM3RGZ2VyWlk0b0xwakZ6cStVY0VKOXEzSUhtalphbkE2Ui9lcUxBR3RwNkI5SlFMbEFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NDA2MDExCWZpbGU6c3BlZWNoMnRleHRfMS4xLjFfeDY0LXNldHVwLmV4ZQpJSldVSUY3VU1xdm5DNUVGTmQwUkh3QUtLMHorcVBhRzlTb2ppaS8zbzBaT1FlZmo5ek9lcjJ0NytTT0tBWmlvRWg0ZENWdmpVbm8zaW82bFJ1aVdCZz09Cg==",
+      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.1/speech2text_1.1.1_x64-setup.exe"
     }
   }
 }
