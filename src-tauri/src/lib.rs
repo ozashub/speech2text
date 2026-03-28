@@ -367,8 +367,16 @@ fn exit_app(app: tauri::AppHandle) {
 fn show_overlay(app: tauri::AppHandle, state: String) -> Result<(), String> {
     position_overlay_on_active_monitor(&app);
     if let Some(w) = app.get_webview_window("overlay") {
+        let waking = !w.is_visible().unwrap_or(true);
         let _ = w.show();
-        let _ = app.emit("overlay-state", state);
+        let _ = app.emit("overlay-state", &state);
+        if waking {
+            let handle = app.clone();
+            thread::spawn(move || {
+                thread::sleep(std::time::Duration::from_millis(80));
+                let _ = handle.emit("overlay-state", state);
+            });
+        }
     }
     Ok(())
 }
@@ -467,7 +475,6 @@ unsafe extern "system" fn kb_proc(
                     s.active = false;
                     s.pressed.clear();
                     let _ = s.app.emit("cancel-recording", ());
-                    let _ = s.app.emit("overlay-state", "cancelled");
                 }
             }
         }

@@ -148,7 +148,6 @@ export default function App() {
     stat("Cancelled", "");
     invoke("show_overlay", { state: "cancelled" }).catch(() => {});
     setTimeout(() => {
-      invoke("hide_overlay").catch(() => {});
       if (!recRef.current) stat("Ready", "");
     }, 1500);
   }, []);
