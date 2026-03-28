@@ -1,11 +1,11 @@
 {
-  "version": "1.1.2",
-  "notes": "Keybind overrides transcription, fix updater deadlock",
-  "pub_date": "2026-03-25T00:00:00Z",
+  "version": "1.1.3",
+  "notes": "Fix overlay not showing on some triggers",
+  "pub_date": "2026-03-28T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTU1FrTUtlcFpEamdCMXFmZ0dMRWpBSHZBZXdmeDFUQW1zcC8rU2tyTVp5MzhiVlM4c1IvMG1QZjh1QWdxTUdldjhQMDE1T2FFRFFUODFvai9Zckx0QisxS21QOE16amdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NDA2NDY2CWZpbGU6c3BlZWNoMnRleHRfMS4xLjJfeDY0LXNldHVwLmV4ZQo5ZUoxMHVVTnV6aVlEQ2FsVGh3YzlSdWEyd0dvMW5acnVobGZ3YWxNOHpVZlAyVThjNjl5MG54OFBwbVd6N2g4UE5uY2U4bjdJUmVnUWpIYXBsb3lDZz09Cg==",
-      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.2/speech2text_1.1.2_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTU1FrTUtlcFpEanRjT0JxUTc1UHU0RDZ1amhyMzdBbWliZHBrdk9jK3ZGK1NsQzhkWkhRbzFndVBha0c5WnJQdW5rcTAyWnJIN09pZisrS2ZKLzFjY2VXYUIrOUQxTFFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NjcyNjc0CWZpbGU6c3BlZWNoMnRleHRfMS4xLjNfeDY0LXNldHVwLmV4ZQowNGh0M3E3ZzR3Z3N6TStkSnZTSW40RnlJMzdkR1pJS1JLRFdLSEo3d2N6S3lNTi9RSkVFbDg0VjJTZDVrVkxKVUZFV1Y2R3M4NUE5T0hiVWJCbkNEZz09Cg==",
+      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.3/speech2text_1.1.3_x64-setup.exe"
     }
   }
 }
