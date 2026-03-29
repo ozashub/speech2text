@@ -1,11 +1,11 @@
 {
-  "version": "1.1.3",
-  "notes": "Fix overlay not showing on some triggers",
-  "pub_date": "2026-03-28T00:00:00Z",
+  "version": "1.1.4",
+  "notes": "Fix auto-updater not installing after download",
+  "pub_date": "2026-03-29T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTU1FrTUtlcFpEanRjT0JxUTc1UHU0RDZ1amhyMzdBbWliZHBrdk9jK3ZGK1NsQzhkWkhRbzFndVBha0c5WnJQdW5rcTAyWnJIN09pZisrS2ZKLzFjY2VXYUIrOUQxTFFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NjcyNjc0CWZpbGU6c3BlZWNoMnRleHRfMS4xLjNfeDY0LXNldHVwLmV4ZQowNGh0M3E3ZzR3Z3N6TStkSnZTSW40RnlJMzdkR1pJS1JLRFdLSEo3d2N6S3lNTi9RSkVFbDg0VjJTZDVrVkxKVUZFV1Y2R3M4NUE5T0hiVWJCbkNEZz09Cg==",
-      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.3/speech2text_1.1.3_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTU1FrTUtlcFpEanFqQ1lKNTZNRllvZ08vRllZSURQY1Raa0Q1bUROZVc0YThVcG5yaWI5QlNVaTdmcC9mMEEzeGFMMVRIeGZHMVUrb2pyeDdKYXFaNkg1MTQ3bkw2aVFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0ODA2OTI1CWZpbGU6c3BlZWNoMnRleHRfMS4xLjRfeDY0LXNldHVwLmV4ZQpvRit3cHpkMzg2SXpuV3dqQXI3UmtmZjQ2MjkvVytCNExCdjErT0NGOUtTUldRZEpqTXRDM0FHOHNjZ3VFc2h5NEtoTmw5d0RjaG5YaWEveGhKS0dDZz09Cg==",
+      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.4/speech2text_1.1.4_x64-setup.exe"
     }
   }
 }
