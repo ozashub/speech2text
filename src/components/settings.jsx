@@ -137,11 +137,9 @@ export default function Settings({ onClose, onSaved }) {
           received += e.data.chunkLength;
           if (total > 0) setUpdateProgress((received / total) * 100);
         }
-        if (e.event === "Finished") {
-          setUpdateStatus("installing");
-          setTimeout(() => invoke("exit_app").catch(() => {}), 500);
-        }
+        if (e.event === "Finished") setUpdateStatus("installing");
       });
+      await invoke("exit_app");
     } catch {
       setUpdateStatus("error");
     }
