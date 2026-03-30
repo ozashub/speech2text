@@ -38,12 +38,10 @@ export default function App() {
   const [processing, setProcessing] = useState(false);
   const [status, setStatus] = useState("Ready");
   const [statusType, setStatusType] = useState("");
-  const [transcript, setTranscript] = useState("");
   const [history, setHistory] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
   const [hasKey, setHasKey] = useState(false);
   const [keybindLabel, setKeybindLabel] = useState("Ctrl+Shift");
-  const [micReady, setMicReady] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(null);
   const [updating, setUpdating] = useState(false);
   const [stats, setStats] = useState([0, 0, 0]);
@@ -59,15 +57,9 @@ export default function App() {
   const sessionRef = useRef(0);
   const recStartRef = useRef(0);
 
-  useEffect(() => {
-    recRef.current = recording;
-  }, [recording]);
-  useEffect(() => {
-    procRef.current = processing;
-  }, [processing]);
-  useEffect(() => {
-    keyRef.current = hasKey;
-  }, [hasKey]);
+  useEffect(() => { recRef.current = recording; }, [recording]);
+  useEffect(() => { procRef.current = processing; }, [processing]);
+  useEffect(() => { keyRef.current = hasKey; }, [hasKey]);
 
   const stat = (text, type = "") => {
     setStatus(text);
@@ -95,7 +87,6 @@ export default function App() {
         analyser.smoothingTimeConstant = 0.8;
         source.connect(analyser);
         analyserRef.current = analyser;
-        setMicReady(true);
         appWindow.show();
       })
       .catch(() => {
@@ -167,7 +158,6 @@ export default function App() {
     try {
       const text = await invoke("transcribe", { audioBase64: b64 });
       if (sid !== sessionRef.current) return;
-      setTranscript(text);
       setHistory((h) => [{ text, time: new Date() }, ...h].slice(0, 20));
       const secs = Math.round((Date.now() - recStartRef.current) / 1000);
       const wc = text.split(/\s+/).filter(Boolean).length;
@@ -337,10 +327,7 @@ export default function App() {
               <h3>Transcripts</h3>
               <button
                 className="clear-btn"
-                onClick={() => {
-                  setHistory([]);
-                  setTranscript("");
-                }}
+                onClick={() => setHistory([])}
               >
                 Clear
               </button>

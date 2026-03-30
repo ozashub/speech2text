@@ -65,6 +65,39 @@ function KeybindCapture({ value, onChange }) {
   );
 }
 
+function SubModal({ open, title, text, onChange, placeholder, rows, hint, onSave, onClose, onReset }) {
+  const [closing, setClosing] = useState(false);
+  if (!open) return null;
+
+  const dismiss = () => {
+    setClosing(true);
+    setTimeout(() => { setClosing(false); onClose(); }, 200);
+  };
+
+  const save = () => {
+    onSave();
+    setClosing(true);
+    setTimeout(() => { setClosing(false); onClose(); }, 200);
+  };
+
+  return (
+    <div className={`prompt-overlay ${closing ? "out" : ""}`} onClick={dismiss}>
+      <div className="prompt-editor" onClick={(e) => e.stopPropagation()}>
+        <div className="prompt-header">
+          <h3>{title}</h3>
+          <button className="prompt-reset" type="button" onClick={onReset}>Reset to default</button>
+        </div>
+        <textarea value={text} onChange={(e) => onChange(e.target.value)} spellCheck={false} placeholder={placeholder} rows={rows} />
+        {hint && <span className="field-hint" style={{marginTop: 4}}>{hint}</span>}
+        <div className="prompt-actions">
+          <button className="btn-save" onClick={save}>Save</button>
+          <button className="btn-cancel" onClick={dismiss}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Settings({ onClose, onSaved }) {
   const [key, setKey] = useState("");
   const [lang, setLang] = useState("");
@@ -80,11 +113,9 @@ export default function Settings({ onClose, onSaved }) {
   const [shareStatus, setShareStatus] = useState("");
   const [savedKey, setSavedKey] = useState("");
   const [promptOpen, setPromptOpen] = useState(false);
-  const [promptClosing, setPromptClosing] = useState(false);
   const [promptText, setPromptText] = useState("");
   const [promptSaved, setPromptSaved] = useState("");
   const [wordFixesOpen, setWordFixesOpen] = useState(false);
-  const [wordFixesClosing, setWordFixesClosing] = useState(false);
   const [wordFixesText, setWordFixesText] = useState("");
   const [wordFixesSaved, setWordFixesSaved] = useState("");
   const updateRef = useRef(null);
@@ -205,19 +236,6 @@ export default function Settings({ onClose, onSaved }) {
   const openPrompt = () => {
     setPromptText(promptSaved);
     setPromptOpen(true);
-    setPromptClosing(false);
-  };
-
-  const closePrompt = () => {
-    setPromptClosing(true);
-    setTimeout(() => { setPromptOpen(false); setPromptClosing(false); setPromptText(promptSaved); }, 200);
-  };
-
-  const savePrompt = async () => {
-    await invoke("save_enhance_prompt", { prompt: promptText }).catch(() => {});
-    setPromptSaved(promptText);
-    setPromptClosing(true);
-    setTimeout(() => { setPromptOpen(false); setPromptClosing(false); }, 200);
   };
 
   const resetPrompt = async () => {
@@ -225,18 +243,6 @@ export default function Settings({ onClose, onSaved }) {
     const p = await invoke("load_enhance_prompt");
     setPromptText(p);
     setPromptSaved(p);
-  };
-
-  const closeWordFixes = () => {
-    setWordFixesClosing(true);
-    setTimeout(() => { setWordFixesOpen(false); setWordFixesClosing(false); setWordFixesText(wordFixesSaved); }, 200);
-  };
-
-  const saveWordFixes = async () => {
-    await invoke("save_word_fixes", { words: wordFixesText }).catch(() => {});
-    setWordFixesSaved(wordFixesText);
-    setWordFixesClosing(true);
-    setTimeout(() => { setWordFixesOpen(false); setWordFixesClosing(false); }, 200);
   };
 
   const resetWordFixes = async () => {
@@ -354,49 +360,29 @@ export default function Settings({ onClose, onSaved }) {
         </>}
       </div>
 
-      {promptOpen && (
-        <div className={`prompt-overlay ${promptClosing ? "out" : ""}`} onClick={closePrompt}>
-          <div className="prompt-editor" onClick={(e) => e.stopPropagation()}>
-            <div className="prompt-header">
-              <h3>Enhance Prompt</h3>
-              <button className="prompt-reset" type="button" onClick={resetPrompt}>Reset to default</button>
-            </div>
-            <textarea
-              value={promptText}
-              onChange={(e) => setPromptText(e.target.value)}
-              spellCheck={false}
-              placeholder="Enter your custom enhance prompt..."
-            />
-            <div className="prompt-actions">
-              <button className="btn-save" onClick={savePrompt}>Save</button>
-              <button className="btn-cancel" onClick={closePrompt}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SubModal
+        open={promptOpen}
+        title="Enhance Prompt"
+        text={promptText}
+        onChange={setPromptText}
+        placeholder="Enter your custom enhance prompt..."
+        onClose={() => { setPromptOpen(false); setPromptText(promptSaved); }}
+        onSave={async () => { await invoke("save_enhance_prompt", { prompt: promptText }).catch(() => {}); setPromptSaved(promptText); }}
+        onReset={resetPrompt}
+      />
 
-      {wordFixesOpen && (
-        <div className={`prompt-overlay ${wordFixesClosing ? "out" : ""}`} onClick={closeWordFixes}>
-          <div className="prompt-editor" onClick={(e) => e.stopPropagation()}>
-            <div className="prompt-header">
-              <h3>Word Fixes</h3>
-              <button className="prompt-reset" type="button" onClick={resetWordFixes}>Reset to default</button>
-            </div>
-            <textarea
-              value={wordFixesText}
-              onChange={(e) => setWordFixesText(e.target.value)}
-              spellCheck={false}
-              placeholder="Groq, GitHub, TypeScript, ..."
-              rows={4}
-            />
-            <span className="field-hint" style={{marginTop: 4}}>Comma-separated. Whisper will prefer these exact spellings.</span>
-            <div className="prompt-actions">
-              <button className="btn-save" onClick={saveWordFixes}>Save</button>
-              <button className="btn-cancel" onClick={closeWordFixes}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SubModal
+        open={wordFixesOpen}
+        title="Word Fixes"
+        text={wordFixesText}
+        onChange={setWordFixesText}
+        placeholder="Groq, GitHub, TypeScript, ..."
+        rows={4}
+        hint="Comma-separated. Whisper will prefer these exact spellings."
+        onClose={() => { setWordFixesOpen(false); setWordFixesText(wordFixesSaved); }}
+        onSave={async () => { await invoke("save_word_fixes", { words: wordFixesText }).catch(() => {}); setWordFixesSaved(wordFixesText); }}
+        onReset={resetWordFixes}
+      />
     </div>
   );
 }

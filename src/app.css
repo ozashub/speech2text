@@ -308,6 +308,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  scrollbar-color: var(--text-3) transparent;
 }
 
 .history-list::-webkit-scrollbar {
@@ -319,9 +320,6 @@ main {
 }
 .history-list::-webkit-scrollbar-track {
   background: transparent;
-}
-.history-list {
-  scrollbar-color: var(--text-3) transparent;
 }
 
 .history-item {
@@ -481,6 +479,8 @@ kbd {
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
   animation: modal-up 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+  scrollbar-color: var(--text-3) transparent;
+  scrollbar-width: thin;
 }
 
 .modal::-webkit-scrollbar {
@@ -492,10 +492,6 @@ kbd {
 }
 .modal::-webkit-scrollbar-track {
   background: transparent;
-}
-.modal {
-  scrollbar-color: var(--text-3) transparent;
-  scrollbar-width: thin;
 }
 
 @keyframes modal-up {
