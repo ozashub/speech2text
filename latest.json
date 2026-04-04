@@ -1,11 +1,11 @@
 {
-  "version": "1.1.4",
-  "notes": "Fix auto-updater not installing after download",
-  "pub_date": "2026-03-29T00:00:00Z",
+  "version": "1.2.0",
+  "notes": "Fix stuck recording on system shortcuts, add speech WPM stat, fix settings close animation and keybind label update",
+  "pub_date": "2026-04-04T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTU1FrTUtlcFpEanFqQ1lKNTZNRllvZ08vRllZSURQY1Raa0Q1bUROZVc0YThVcG5yaWI5QlNVaTdmcC9mMEEzeGFMMVRIeGZHMVUrb2pyeDdKYXFaNkg1MTQ3bkw2aVFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0ODA2OTI1CWZpbGU6c3BlZWNoMnRleHRfMS4xLjRfeDY0LXNldHVwLmV4ZQpvRit3cHpkMzg2SXpuV3dqQXI3UmtmZjQ2MjkvVytCNExCdjErT0NGOUtTUldRZEpqTXRDM0FHOHNjZ3VFc2h5NEtoTmw5d0RjaG5YaWEveGhKS0dDZz09Cg==",
-      "url": "https://github.com/ozashub/speech2text/releases/download/v1.1.4/speech2text_1.1.4_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTU1FrTUtlcFpEanQvSUVWMTBoVDY4cHFJRnVCZjErYjM4aml1NGo0RWZYQUx1SExTTDJhVCtPRytuOTQ1QkdQR1hKRGlVOWhpd2R6TzFpUGUyTlBVV1NxeHdzcU5Cc1FrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc1Mjg0MjIzCWZpbGU6c3BlZWNoMnRleHRfMS4yLjBfeDY0LXNldHVwLmV4ZQp5WVNQdWFTbFpIT0U3T1ZUS2llRnpEOURyNHB2NEJURXVNTXBXdHIvWEZPaSt4ZDZYYnJrdU5qV1JwTFV6RjlQQmZPZjBEQnd4VjNQTnIwckJVUVdEQT09Cg==",
+      "url": "https://github.com/ozashub/speech2text/releases/download/v1.2.0/speech2text_1.2.0_x64-setup.exe"
     }
   }
 }
