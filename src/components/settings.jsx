@@ -184,7 +184,7 @@ export default function Settings({ onClose, onSaved }) {
       await invoke("save_enhance", { enabled: enhance });
       await invoke("save_word_fixes", { words: wordFixesText });
       await invoke("set_autostart", { enabled: autostart });
-      onSaved();
+      onSaved(keybind);
       animateClose(onClose);
     } catch {}
   };

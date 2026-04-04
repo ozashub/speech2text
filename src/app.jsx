@@ -381,15 +381,10 @@ export default function App() {
       {showSettings && (
         <Settings
           onClose={() => setShowSettings(false)}
-          onSaved={() => {
+          onSaved={(keys) => {
             setHasKey(true);
-            setShowSettings(false);
             stat("Ready", "");
-            invoke("load_keybind")
-              .then((k) => {
-                if (k?.length) setKeybindLabel(k.join("+"));
-              })
-              .catch(() => {});
+            if (keys?.length) setKeybindLabel(keys.join("+"));
           }}
         />
       )}
