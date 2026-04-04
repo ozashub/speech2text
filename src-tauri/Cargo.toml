@@ -1,6 +1,6 @@
 [package]
 name = "speech2text"
-version = "1.1.4"
+version = "1.2.0"
 description = "Speech to text via Groq Whisper"
 authors = ["ozas"]
 edition = "2021"

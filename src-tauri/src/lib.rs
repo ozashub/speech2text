@@ -82,6 +82,7 @@ mod win {
         pub fn GetForegroundWindow() -> HWND;
         pub fn MonitorFromWindow(hwnd: HWND, dwFlags: u32) -> isize;
         pub fn GetMonitorInfoW(hMonitor: isize, lpmi: *mut MONITORINFO) -> i32;
+        pub fn GetAsyncKeyState(vKey: i32) -> i16;
     }
 }
 
@@ -216,6 +217,18 @@ fn bump_stats(app: tauri::AppHandle, words: u64, seconds: u64) -> Result<(), Str
     c.stats_recordings = Some(c.stats_recordings.unwrap_or(0) + 1);
     c.stats_seconds = Some(c.stats_seconds.unwrap_or(0) + seconds);
     write_config(&app, &c)
+}
+
+#[tauri::command]
+fn check_keys_held() -> bool {
+    if let Ok(g) = HOOK.try_lock() {
+        if let Some(ref s) = *g {
+            return s.keys.iter().all(|&k| unsafe {
+                (win::GetAsyncKeyState(k as i32) as u16 & 0x8000) != 0
+            });
+        }
+    }
+    false
 }
 
 #[tauri::command]
@@ -457,24 +470,37 @@ unsafe extern "system" fn kb_proc(
         if let Ok(mut g) = HOOK.try_lock() {
             if let Some(ref mut s) = *g {
                 if !s.enabled {
-                } else if s.keys.contains(&vk) {
-                    if msg == win::WM_KEYDOWN || msg == win::WM_SYSKEYDOWN {
-                        s.pressed.insert(vk);
-                        if !s.active && s.keys.iter().all(|k| s.pressed.contains(k)) {
-                            s.active = true;
-                            let _ = s.app.emit("start-recording", ());
-                        }
-                    } else if msg == win::WM_KEYUP || msg == win::WM_SYSKEYUP {
-                        s.pressed.remove(&vk);
-                        if s.active && !s.keys.iter().any(|k| s.pressed.contains(k)) {
+                } else {
+                    if s.active {
+                        let stale = s.keys.iter().any(|&k|
+                            (win::GetAsyncKeyState(k as i32) as u16 & 0x8000) == 0
+                        );
+                        if stale {
                             s.active = false;
+                            s.pressed.clear();
                             let _ = s.app.emit("stop-recording", ());
                         }
                     }
-                } else if s.active && (msg == win::WM_KEYDOWN || msg == win::WM_SYSKEYDOWN) {
-                    s.active = false;
-                    s.pressed.clear();
-                    let _ = s.app.emit("cancel-recording", ());
+
+                    if s.keys.contains(&vk) {
+                        if msg == win::WM_KEYDOWN || msg == win::WM_SYSKEYDOWN {
+                            s.pressed.insert(vk);
+                            if !s.active && s.keys.iter().all(|k| s.pressed.contains(k)) {
+                                s.active = true;
+                                let _ = s.app.emit("start-recording", ());
+                            }
+                        } else if msg == win::WM_KEYUP || msg == win::WM_SYSKEYUP {
+                            s.pressed.remove(&vk);
+                            if s.active && !s.keys.iter().any(|k| s.pressed.contains(k)) {
+                                s.active = false;
+                                let _ = s.app.emit("stop-recording", ());
+                            }
+                        }
+                    } else if s.active && (msg == win::WM_KEYDOWN || msg == win::WM_SYSKEYDOWN) {
+                        s.active = false;
+                        s.pressed.clear();
+                        let _ = s.app.emit("cancel-recording", ());
+                    }
                 }
             }
         }
@@ -661,6 +687,7 @@ pub fn run() {
                 load_word_fixes,
                 load_stats,
                 bump_stats,
+                check_keys_held,
                 set_hook_enabled,
                 get_autostart,
                 set_autostart,

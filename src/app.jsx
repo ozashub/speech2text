@@ -56,6 +56,7 @@ export default function App() {
   const chunksRef = useRef([]);
   const sessionRef = useRef(0);
   const recStartRef = useRef(0);
+  const hotkeyRef = useRef(false);
 
   useEffect(() => { recRef.current = recording; }, [recording]);
   useEffect(() => { procRef.current = processing; }, [processing]);
@@ -95,13 +96,14 @@ export default function App() {
       });
   }, []);
 
-  const start = useCallback(() => {
+  const start = useCallback((fromHotkey = false) => {
     if (recRef.current || !streamRef.current) return;
     if (!keyRef.current) {
       setShowSettings(true);
       return;
     }
 
+    hotkeyRef.current = fromHotkey;
     sessionRef.current++;
     setProcessing(false);
     chunksRef.current = [];
@@ -206,7 +208,7 @@ export default function App() {
       })
       .catch(() => {});
 
-    const u1 = listen("start-recording", () => start());
+    const u1 = listen("start-recording", () => start(true));
     const u2 = listen("stop-recording", () => stop());
     const u3 = listen("key-imported", () => {
       setHasKey(true);
@@ -221,6 +223,16 @@ export default function App() {
       u4.then((f) => f());
     };
   }, [start, stop, cancel]);
+
+  useEffect(() => {
+    if (!recording || !hotkeyRef.current) return;
+    const id = setInterval(() => {
+      invoke("check_keys_held").then((held) => {
+        if (!held && recRef.current) stop();
+      }).catch(() => {});
+    }, 300);
+    return () => clearInterval(id);
+  }, [recording, stop]);
 
   return (
     <div className="shell">
@@ -343,7 +355,7 @@ export default function App() {
 
       {(stats[0] > 0 || stats[1] > 0) && (
         <div className="stats-bar">
-          {stats[0].toLocaleString()} word{stats[0] !== 1 ? "s" : ""} · {Math.round(stats[2] / 60)} min recorded · {stats[1]} recording{stats[1] !== 1 ? "s" : ""}
+          {stats[0].toLocaleString()} word{stats[0] !== 1 ? "s" : ""} · {Math.round(stats[2] / 60)} min recorded · {stats[1]} recording{stats[1] !== 1 ? "s" : ""} · {stats[2] > 0 ? Math.round(stats[0] / (stats[2] / 60)) : 0} wpm
         </div>
       )}
 
