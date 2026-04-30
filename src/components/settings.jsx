@@ -136,11 +136,12 @@ export default function Settings({ onClose, onSaved }) {
       invoke("load_enhance_prompt").then((p) => { setPromptText(p); setPromptSaved(p); }).catch(() => {}),
       invoke("load_word_fixes").then((w) => { setWordFixesText(w); setWordFixesSaved(w); }).catch(() => {}),
       getVersion().then(setVersion).catch(() => {}),
-    ]).then(() => {
-      setLoaded(true);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    });
+    ]).then(() => setLoaded(true));
   }, []);
+
+  useEffect(() => {
+    if (loaded) inputRef.current?.focus();
+  }, [loaded]);
 
   const checkUpdate = async () => {
     setUpdateStatus("checking");

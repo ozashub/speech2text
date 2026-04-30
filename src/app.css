@@ -63,25 +63,9 @@ body,
   content: "";
   position: fixed;
   inset: 0;
-  background: conic-gradient(
-    from 180deg at 50% 30%,
-    #7c5cfc 0deg,
-    #5b3dd4 90deg,
-    #1a0a3e 180deg,
-    #5b3dd4 270deg,
-    #7c5cfc 360deg
-  );
-  mask:
-    radial-gradient(ellipse 80% 60% at 50% 20%, white, transparent 70%),
-    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 /
-      var(--grid) var(--grid);
-  -webkit-mask:
-    radial-gradient(ellipse 80% 60% at 50% 20%, white, transparent 70%),
-    radial-gradient(circle at 50% 50%, white 0.8px, transparent 1px) 0 0 /
-      var(--grid) var(--grid);
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
-  opacity: 0.2;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(124, 92, 252, 0.18), transparent 70%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0.8px, transparent 1px) 0 0 / var(--grid) var(--grid);
   pointer-events: none;
   z-index: 0;
 }

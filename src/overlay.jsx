@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/core";
 import "./overlay.css";
 
 function Overlay() {
@@ -12,14 +11,33 @@ function Overlay() {
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    const unlisten = listen("overlay-state", (e) => {
+    const clearTimers = () => {
       timersRef.current.forEach(clearTimeout);
       timersRef.current = [];
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setHiding(false);
-      setState(e.payload);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
 
-      if (e.payload === "recording") {
+    const unlisten = listen("overlay-state", (e) => {
+      const next = e.payload || null;
+      clearTimers();
+
+      if (!next) {
+        setHiding(true);
+        const t = setTimeout(() => {
+          setState(null);
+          setHiding(false);
+        }, 280);
+        timersRef.current.push(t);
+        return;
+      }
+
+      setHiding(false);
+      setState(next);
+
+      if (next === "recording") {
         setElapsed(0);
         const start = Date.now();
         intervalRef.current = setInterval(() => {
@@ -27,27 +45,23 @@ function Overlay() {
         }, 200);
       }
 
-      if (e.payload !== "recording" && intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-
-      if (e.payload === "done" || e.payload === "cancelled") {
-        const delay = e.payload === "cancelled" ? 800 : 1200;
-        const t1 = setTimeout(() => {
+      if (next === "done" || next === "cancelled") {
+        const delay = next === "cancelled" ? 800 : 1200;
+        const t = setTimeout(() => {
           setHiding(true);
           const t2 = setTimeout(() => {
             setState(null);
-            invoke("hide_overlay").catch(() => {});
+            setHiding(false);
           }, 280);
           timersRef.current.push(t2);
         }, delay);
-        timersRef.current.push(t1);
+        timersRef.current.push(t);
       }
     });
+
     return () => {
       unlisten.then((f) => f());
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      clearTimers();
     };
   }, []);
 
@@ -77,9 +91,7 @@ function Overlay() {
             ? "Transcribing..."
             : state === "done"
               ? "Done"
-              : state === "cancelled"
-                ? "Cancelled"
-                : state}
+              : "Cancelled"}
       </span>
     </div>
   );

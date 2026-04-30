@@ -1,8 +1,12 @@
 import { useEffect, useRef } from "react";
 
+const BAR_COUNT = 64;
+const BAR_WIDTH = 2.5;
+
 export default function Visualizer({ analyserRef, recording, processing }) {
   const canvasRef = useRef(null);
-  const smoothed = useRef(new Float32Array(64));
+  const smoothed = useRef(new Float32Array(BAR_COUNT));
+  const freqBuf = useRef(null);
   const state = useRef({ recording, processing });
   state.current = { recording, processing };
 
@@ -10,77 +14,78 @@ export default function Visualizer({ analyserRef, recording, processing }) {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     let animId;
+    let cssW = 0;
+    let cssH = 0;
 
-    function resize() {
+    const resize = () => {
       const r = canvas.getBoundingClientRect();
-      canvas.width = r.width * devicePixelRatio;
-      canvas.height = r.height * devicePixelRatio;
+      cssW = r.width;
+      cssH = r.height;
+      canvas.width = cssW * devicePixelRatio;
+      canvas.height = cssH * devicePixelRatio;
       ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-    }
+    };
 
-    function draw() {
-      const r = canvas.getBoundingClientRect();
-      const w = r.width;
-      const h = r.height;
-      ctx.clearRect(0, 0, w, h);
+    const draw = () => {
+      ctx.clearRect(0, 0, cssW, cssH);
 
       const { recording: rec, processing: proc } = state.current;
-      const count = 64;
-      const bw = 2.5;
-      const gap = (w - count * bw) / (count + 1);
+      const gap = (cssW - BAR_COUNT * BAR_WIDTH) / (BAR_COUNT + 1);
 
       let data = null;
-      if (analyserRef.current && rec) {
-        data = new Uint8Array(analyserRef.current.frequencyBinCount);
-        analyserRef.current.getByteFrequencyData(data);
+      const analyser = analyserRef.current;
+      if (analyser && rec) {
+        if (!freqBuf.current || freqBuf.current.length !== analyser.frequencyBinCount) {
+          freqBuf.current = new Uint8Array(analyser.frequencyBinCount);
+        }
+        analyser.getByteFrequencyData(freqBuf.current);
+        data = freqBuf.current;
       }
 
       const s = smoothed.current;
-      for (let i = 0; i < count; i++) {
-        let target = 0;
-        if (data) {
-          const idx = Math.floor((i * data.length) / count);
-          target = data[idx] / 255;
-        }
-        s[i] += (target - s[i]) * 0.12;
-        if (s[i] < 0.004) s[i] = 0;
+      const t = proc ? Date.now() / 400 : 0;
 
-        const x = gap + i * (bw + gap);
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const x = gap + i * (BAR_WIDTH + gap);
 
         if (proc) {
-          const t = Date.now() / 400;
           const wave = Math.sin(t + i * 0.18) * 0.5 + 0.5;
           const bh = 3 + wave * 16;
-          const grad = ctx.createLinearGradient(x, (h - bh) / 2, x, (h + bh) / 2);
+          const y = (cssH - bh) / 2;
+          const grad = ctx.createLinearGradient(x, y, x, y + bh);
           grad.addColorStop(0, `rgba(124, 92, 252, ${wave * 0.6})`);
-          grad.addColorStop(1, `rgba(124, 92, 252, 0.05)`);
+          grad.addColorStop(1, "rgba(124, 92, 252, 0.05)");
           ctx.fillStyle = grad;
           ctx.beginPath();
-          ctx.roundRect(x, (h - bh) / 2, bw, bh, 1);
+          ctx.roundRect(x, y, BAR_WIDTH, bh, 1);
           ctx.fill();
           continue;
         }
 
+        const target = data ? data[Math.floor((i * data.length) / BAR_COUNT)] / 255 : 0;
+        s[i] += (target - s[i]) * 0.12;
+        if (s[i] < 0.004) s[i] = 0;
+
         const val = s[i];
-        const bh = Math.max(2, val * (h - 8));
-        const y = (h - bh) / 2;
+        const bh = Math.max(2, val * (cssH - 8));
+        const y = (cssH - bh) / 2;
 
         if (rec) {
           const grad = ctx.createLinearGradient(x, y, x, y + bh);
           grad.addColorStop(0, `rgba(124, 92, 252, ${0.3 + val * 0.7})`);
-          grad.addColorStop(1, `rgba(124, 92, 252, 0.05)`);
+          grad.addColorStop(1, "rgba(124, 92, 252, 0.05)");
           ctx.fillStyle = grad;
         } else {
           ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
         }
 
         ctx.beginPath();
-        ctx.roundRect(x, y, bw, bh, 1);
+        ctx.roundRect(x, y, BAR_WIDTH, bh, 1);
         ctx.fill();
       }
 
       animId = requestAnimationFrame(draw);
-    }
+    };
 
     resize();
     window.addEventListener("resize", resize);

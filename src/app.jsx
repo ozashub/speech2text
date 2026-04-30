@@ -33,6 +33,8 @@ function HistoryItem({ item, latest }) {
   );
 }
 
+let historyId = 0;
+
 export default function App() {
   const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -145,7 +147,7 @@ export default function App() {
     }, 1500);
   }, []);
 
-  const done = async () => {
+  const done = useCallback(async () => {
     const sid = sessionRef.current;
     setProcessing(true);
     stat("Transcribing...", "");
@@ -160,10 +162,12 @@ export default function App() {
     try {
       const text = await invoke("transcribe", { audioBase64: b64 });
       if (sid !== sessionRef.current) return;
-      setHistory((h) => [{ text, time: new Date() }, ...h].slice(0, 20));
+      setHistory((h) => [{ id: ++historyId, text, time: new Date() }, ...h].slice(0, 20));
       const secs = Math.round((Date.now() - recStartRef.current) / 1000);
       const wc = text.split(/\s+/).filter(Boolean).length;
-      invoke("bump_stats", { words: wc, seconds: secs }).then(() => invoke("load_stats").then(setStats)).catch(() => {});
+      invoke("bump_stats", { words: wc, seconds: secs })
+        .then(() => invoke("load_stats").then(setStats))
+        .catch(() => {});
       stat("Pasting...", "done");
       await invoke("paste_text", { text });
       if (sid !== sessionRef.current) return;
@@ -182,7 +186,7 @@ export default function App() {
     }
 
     setProcessing(false);
-  };
+  }, []);
 
   useEffect(() => {
     invoke("load_api_key")
@@ -346,7 +350,7 @@ export default function App() {
             </div>
             <div className="history-list">
               {history.map((h, i) => (
-                <HistoryItem key={h.time.getTime()} item={h} latest={i === 0} />
+                <HistoryItem key={h.id} item={h} latest={i === 0} />
               ))}
             </div>
           </section>
