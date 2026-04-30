@@ -69,9 +69,9 @@ export default function App() {
     setStatusType(type);
   };
 
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({
+  const acquireStream = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
@@ -79,47 +79,106 @@ export default function App() {
           sampleRate: 16000,
           channelCount: 1,
         },
-      })
-      .then((stream) => {
-        streamRef.current = stream;
-        const ctx = new AudioContext({ sampleRate: 16000 });
-        ctxRef.current = ctx;
-        const source = ctx.createMediaStreamSource(stream);
-        const analyser = ctx.createAnalyser();
-        analyser.fftSize = 256;
-        analyser.smoothingTimeConstant = 0.8;
-        source.connect(analyser);
-        analyserRef.current = analyser;
-        appWindow.show();
-      })
-      .catch(() => {
-        stat("Mic denied", "err");
-        appWindow.show();
       });
+
+      if (!ctxRef.current) {
+        ctxRef.current = new AudioContext({ sampleRate: 16000 });
+      }
+      const source = ctxRef.current.createMediaStreamSource(stream);
+      const analyser = ctxRef.current.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+      source.connect(analyser);
+
+      stream.getAudioTracks()[0]?.addEventListener("ended", () => {
+        if (streamRef.current === stream) {
+          streamRef.current = null;
+          analyserRef.current = null;
+        }
+      });
+
+      streamRef.current = stream;
+      analyserRef.current = analyser;
+      return stream;
+    } catch {
+      streamRef.current = null;
+      analyserRef.current = null;
+      return null;
+    }
+  };
+
+  const streamAlive = () => {
+    const s = streamRef.current;
+    return !!s && s.getAudioTracks()[0]?.readyState === "live";
+  };
+
+  useEffect(() => {
+    acquireStream().then((s) => {
+      if (!s) stat("Mic denied", "err");
+    });
   }, []);
 
-  const start = useCallback((fromHotkey = false) => {
-    if (recRef.current || !streamRef.current) return;
+  const start = useCallback(async (fromHotkey = false) => {
+    if (recRef.current) return;
     if (!keyRef.current) {
       setShowSettings(true);
       return;
+    }
+
+    if (!streamAlive()) {
+      const s = await acquireStream();
+      if (!s) {
+        stat("Mic unavailable", "err");
+        setTimeout(() => {
+          if (!recRef.current) stat("Ready", "");
+        }, 2500);
+        return;
+      }
     }
 
     hotkeyRef.current = fromHotkey;
     sessionRef.current++;
     setProcessing(false);
     chunksRef.current = [];
+
     const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
       ? "audio/webm;codecs=opus"
       : "audio/webm";
-    const rec = new MediaRecorder(streamRef.current, { mimeType: mime });
+
+    let rec;
+    try {
+      rec = new MediaRecorder(streamRef.current, { mimeType: mime });
+    } catch {
+      stat("Recorder unavailable", "err");
+      return;
+    }
+
     rec.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data);
     };
     rec.onstop = done;
-    rec.start(100);
-    mediaRef.current = rec;
+    rec.onerror = () => {
+      sessionRef.current++;
+      chunksRef.current = [];
+      mediaRef.current = null;
+      setRecording(false);
+      setProcessing(false);
+      stat("Recording error", "err");
+      invoke("show_overlay", { state: "cancelled" }).catch(() => {});
+      streamRef.current = null;
+      analyserRef.current = null;
+    };
 
+    try {
+      rec.start(100);
+    } catch {
+      stat("Mic unavailable", "err");
+      streamRef.current = null;
+      analyserRef.current = null;
+      return;
+    }
+
+    mediaRef.current = rec;
     recStartRef.current = Date.now();
     setRecording(true);
     stat("Recording", "rec");
@@ -149,6 +208,17 @@ export default function App() {
 
   const done = useCallback(async () => {
     const sid = sessionRef.current;
+
+    if (chunksRef.current.length === 0) {
+      setProcessing(false);
+      stat("No audio", "");
+      invoke("show_overlay", { state: "cancelled" }).catch(() => {});
+      setTimeout(() => {
+        if (sid === sessionRef.current && !recRef.current) stat("Ready", "");
+      }, 1500);
+      return;
+    }
+
     setProcessing(true);
     stat("Transcribing...", "");
     invoke("show_overlay", { state: "transcribing" }).catch(() => {});
